@@ -16,8 +16,8 @@ Here are some information about the map:
 - playable with all 4 races. Till around lvl 6, every class has its own starting area, afterwards they use the same paths
  - when playing with a certain race (e.g., kinets), you will mostly find spells from that race, but - depending on your current location - may occasionally find spells from other races
 - randomized loot: upon defeating monsters, you will be rewarded with some new spells, which are drawn randomly from a predefined pool
- - each spell can drop at most 3 times, if you want a fourth copy, you will have to buy it in a shop
- - there are two loot system implementations. Upon starting the mission, the game will prompt you to choose one of them (see Loot system choice)
+  - each spell can drop at most 3 times, if you want a fourth copy, you will have to buy it in a shop
+  - there are two loot system implementations. Upon starting the mission, the game will prompt you to choose one of them (see Loot system choice)
 - unique fights due to shrine effects - throughout the map, you will encounter some of the combat-influencing shrines from the Etherlords II campaign (e.g., the aviak shrine gave +2 might, restless and beserk ability to each aviak). Those shrines will affect you only for one fight (and are usually beneficial for the monster guarding the shrine). You cannot get them permanently
 - up to a certain point (lvl 14ish), monsters behave as you expect them to (typical spells, and only spells from their own race). Around level 14, however, you will trigger paleness. Monsters in pale areas may be more unfair and use spells from multiple races
 - artefacts - as you progress through the game, you will obtain most of the classical artefacts. Choosing the "Artificer" proficiency on leveling may be well worth it
@@ -27,7 +27,7 @@ Here are some information about the map:
 The installation is really easy.
 Open your Etherlords II folder (we use version 1.03, but others should work as well).
 It contains a folder `Maps`, which again contains a folder `Custom`.
-Download all the [files](archive/master.zip) and put them into the `Maps\Custom` folder.
+Download all the [files](archive/master.zip) and put them into the `Maps\Custom` folder (all of them).
 Afterwards, you can play the mission by selecting Single->Mission->New and then choosing the variant you want to play.
 
 If you have any troubles with the installation, don't hesitate to contact me or make an [issue](https://github.com/aloeser/Etherlords2Map/issues).
