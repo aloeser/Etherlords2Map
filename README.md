@@ -1,8 +1,7 @@
-
 # Etherlords II map
 During our childhood, my brother and me played a lot of Etherlords.
 We recently rediscovered the game and decided to develop our own map.
-The map started out as a small project for ourselves, so we kept the in-game text in our native language - German. It's not an issue if you do not speak German: all important (=non-story) dialogues are described in section \ref(MUST-READ). If you do not speak German, you should definitely read this section  before you start playing.
+The map started out as a small project for ourselves, so we kept the in-game text in our native language - German. It's not an issue if you do not speak German: all important (=non-story) dialogues are described in the all-caps section `MUST-READ FOR NON-GERMAN-SPEAKERS`. If you do not speak German, you should definitely read this section before you start playing.
 
 We hope you enjoy our map as much as we do.
 
@@ -16,20 +15,31 @@ Here are some information about the map:
 - randomized loot: upon defeating monsters, you will be rewarded with some new spells, which are drawn randomly from a predefined pool
  - each spell can drop at most 3 times, if you want a fourth copy, you will have to buy it in a shop
  - there are two loot system implementations. Upon starting the mission, the game will prompt you to choose one of them (see Loot system choice)
-- unique fights due to shrine effects - throughout the map, you will encounter some of the battle-influencing shrines from the Etherlords II campaign (e.g., the aviak shrine gave +2 might, restless and beserk ability to each aviak). Those shrines will affect you only for one fight, you cannot get them permanently
+- unique fights due to shrine effects - throughout the map, you will encounter some of the combat-influencing shrines from the Etherlords II campaign (e.g., the aviak shrine gave +2 might, restless and beserk ability to each aviak). Those shrines will affect you only for one fight (and are usually beneficial for the monster guarding the shrine). You cannot get them permanently
 - up to a certain point (lvl 14ish), monsters behave as you expect them to (typical spells, and only spells from their own race). Around level 14, however, you will trigger paleness. Monsters in pale areas may be more unfair and use spells from multiple races
 - artefacts - as you progress through the game, you will obtain most of the classical artefacts. Choosing the "Artificer" proficiency on leveling may be well worth it
 - the final boss has two different decks. Each time you attack him, he will randomly choose one of it. Beating one of the decks is sufficient to win the mission; however, we do encourage you to find a deck that can defeat both decks of the final boss without changing any spells. It is hard, but it can be done!
+
+## Installation
+The installation is really easy.
+Open your Etherlords II folder.
+It contains a folder `Maps`, which again contains a folder `Custom`.
+Download all the [files](archive/master.zip) and put them into the `Maps\Custom` folder.
+Afterwards, you can play the mission by selecting Single->Mission->New and then choosing the variant you want to play.
+
+If you have any troubles with the installation, don't hesitate to contact me or make an [issue].
 
 # MUST-READ FOR NON-GERMAN-SPEAKERS
 While the scripting of the campaign is done in English, all (story) dialogues and player interactions are written in German.
 The following sections provide an overview of all important dialogues.
 
 ## Loot system choice
-On starting the mission you will be asked to choose which loot system you want to use.
+When you start the mission, you will be asked to choose which loot system you want to use.
 In general, the loot (spells) are not fixed per monster, but rather drawn randomly from a predefined pool of spells.
+There are two versions of the loot system:
+
 - The classical version draws a certain number of spells. Press "yes" if you want to play with the classical system
-- The choice version gives you the following choice after each fight: It presents you with a set of spells that you would get as loot. You can choose to accept those (pressing "yes" at the dialogues after a fight), or you can choose to reject them. If you reject them, the system will select (probably) some different spells, which may suit you better, or not. When you reject, there is also a small chance to receive less spells than before. When you did not receive a spell from another race, you cannot receive it by rejecting the loot either. Press "no" if you want to play with the choice version
+- The choice version gives you the following choice after each fight: It presents you with a set of spells that you would get as loot. You can choose to accept those (pressing "yes" at the dialogues after a fight), or you can choose to reject them. If you reject them, the system will select some (probably) different spells, which may suit you better, or not. When you reject, there is also a small chance to receive less spells than before. When you did not receive a spell from another race, you cannot receive it by rejecting the loot either. Press "no" if you want to play with the choice version
 
 ## One-way teleporters
 When playing the official Etherlords campaign, I found it annoying to never know whether I would be able to return through a certain teleporter.
@@ -47,7 +57,7 @@ In the later parts of the game (lvl 15ish), there also is a trader that sells ar
 
 ## Paleness / Colorlessness
 At some point in the story line (lvl 14ish), the antagonist will unleash paleness.
-The disturbances of the ether streams might make the monsters you encounter more dangerous, e.g, allowing them to use spells from different races (which does happen before, but way less frequently).
+The disturbances of the ether streams might make the monsters you encounter more dangerous, e.g., by allowing them to use spells from different races (which does happen before, but way less frequently).
 
 ## Story
 This paragraph contains spoilers about the story. Do not read it if you do not want to be spoilered.
@@ -77,7 +87,7 @@ Consequently, some monsters may be quite hard with, e.g., kinets, but really eas
 During playtesting, I managed to defeat each monster with each race while only using spells of my own race (i.e., simulating no lucky spell drops from other races), so I believe that the monsters should not be too hard. (Not winning in first attempt does not make a monster hard :D)
 
 ## Reason for allowing only hard mode
-Our mission can only be played in hard mode, but not easy or medium mode.
+Our mission **can only be played in hard mode**, but not easy or medium mode.
 **Monsters on easy or medium mode will have no spells**.
 
 The main reason for this decision is that we wanted to add a lot of monsters, while keeping the player on a reasonably low level.
@@ -86,19 +96,21 @@ At the same time, we do not want the player to get ethers (much) faster than the
 We believe that playing in hard mode is a good way to combine those requirements:
 We can give monsters a high health to compensate for their lower level, and boost their ether generation via difficulty (on easy mode, monsters do not get ether as fast, I believe).
 
-## Spoilers
+## Further development
+At the moment, we consider the map as finished and do not plan further development, except of fixing potentials bugs.
 
-### Story?
-
-### Boss fights
+If you want to translate the map to some other language, please contact me before you start.
+At the moment, all dialogue strings are hardcoded in German at the place they are used at, i.e., if someone wants to change the language, you will have to touch hundreds of lines throughout the entire script.
+I consider that somewhat ugly, but sufficient if there is only one language in the map.
+If someone wants to translate the map, I'll build an internationalization system, so that multiple languages can coexist and you can choose your language in game.
+It's not hard, but without knowing if anyone will ever translate or even play this map, the refactoring effort seems not worth it to me.
 
 
 # Acknowledgements
-
-Special thanks to Sebastian Mordziol, the creator of the Ether Planes website [http://etherplanes.net] for providing an online reference of the spells and their codes.
+I would like to thank Sebastian 'The Argh' Mordziol, the creator of the [Ether Planes website](http://etherplanes.net), for providing an online reference of the spells and their codes.
 Setting up the available loot would have been much more painful without this reference.
 
-Further, I would like to thank @Bonesnake for providing the (Roguelike map)[https://github.com/Bonesnake/etherlordsII-roguelike-map].
+Further, I would like to thank @Bonesnake for providing the [Roguelike map](https://github.com/Bonesnake/etherlordsII-roguelike-map).
 When I found the map, I was amazed by the possibilities it showcases, such as random loot generation, changing the available shops, etc.
 Seeing this map motivated me to do some experiments with the scripting myself.
 While only very few elements of the roguelike map are contained in the current version of our map, it was definitely an inspiration for me and made it easier to get into Etherlords' scripting API.
@@ -113,7 +125,7 @@ I do not know where this bug came from, nor how to reliably fix it.
 It might be a general bug in Etherlords, and not specific to the map, but I can't say for sure.
 
 ## Bug reporting
-If you should encounter a bug, be sure to make an (issue)[issue].
+If you should encounter a bug, be sure to make an [issue](issue).
 I'll try to fix it as fast as I can.
 
 If it's crashing with a "script error" (it should not, but who knows..), it would be great if you could upload/paste the `script_err_log.txt` file found in your Etherlords II folder.
