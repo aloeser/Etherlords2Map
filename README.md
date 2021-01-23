@@ -27,7 +27,7 @@ It contains a folder `Maps`, which again contains a folder `Custom`.
 Download all the [files](archive/master.zip) and put them into the `Maps\Custom` folder.
 Afterwards, you can play the mission by selecting Single->Mission->New and then choosing the variant you want to play.
 
-If you have any troubles with the installation, don't hesitate to contact me or make an [issue].
+If you have any troubles with the installation, don't hesitate to contact me or make an [issue](https://github.com/aloeser/Etherlords2Map/issues).
 
 # MUST-READ FOR NON-GERMAN-SPEAKERS
 While the scripting of the campaign is done in English, all (story) dialogues and player interactions are written in German.
@@ -125,7 +125,7 @@ I do not know where this bug came from, nor how to reliably fix it.
 It might be a general bug in Etherlords, and not specific to the map, but I can't say for sure.
 
 ## Bug reporting
-If you should encounter a bug, be sure to make an [issue](issue).
+If you should encounter a bug, be sure to make an [issue](https://github.com/aloeser/Etherlords2Map/issues).
 I'll try to fix it as fast as I can.
 
 If it's crashing with a "script error" (it should not, but who knows..), it would be great if you could upload/paste the `script_err_log.txt` file found in your Etherlords II folder.
