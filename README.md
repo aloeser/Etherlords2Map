@@ -1,9 +1,12 @@
 # Etherlords II map
-During our childhood, my brother and me played a lot of Etherlords.
+During our childhood, my brother and me played a lot of Etherlords I+II.
 We recently rediscovered the game and decided to develop our own map.
-The map started out as a small project for ourselves, so we kept the in-game text in our native language - German. It's not an issue if you do not speak German: all important (=non-story) dialogues are described in the all-caps section `MUST-READ FOR NON-GERMAN-SPEAKERS`. If you do not speak German, you should definitely read this section before you start playing.
+The map started out as a small project for ourselves, so we kept the in-game text in our native language - German. It's not a big deal if you do not speak German: all important (=non-story) dialogues are described in the all-caps section `MUST-READ FOR NON-GERMAN SPEAKERS` (at the bottom). If you do not speak German, you should definitely read this section before you start playing.
 
-We hope you enjoy our map as much as we do.
+Our idea was to offer more power to the players - e.g., higher levels, some spells from other races, and more artifacts than usually available in the mainline campaign; at the same time, we wanted the map to contain challenging and unique fights.
+**The campaign has to played on hard difficulty. Monsters will have no spells on easy and medium difficulty!**
+
+We hope you enjoy our map as much as we do. We appreciate any kind of feedback :)
 
 ## TL;DR: Features of the map
 Here are some information about the map:
@@ -18,63 +21,17 @@ Here are some information about the map:
 - unique fights due to shrine effects - throughout the map, you will encounter some of the combat-influencing shrines from the Etherlords II campaign (e.g., the aviak shrine gave +2 might, restless and beserk ability to each aviak). Those shrines will affect you only for one fight (and are usually beneficial for the monster guarding the shrine). You cannot get them permanently
 - up to a certain point (lvl 14ish), monsters behave as you expect them to (typical spells, and only spells from their own race). Around level 14, however, you will trigger paleness. Monsters in pale areas may be more unfair and use spells from multiple races
 - artefacts - as you progress through the game, you will obtain most of the classical artefacts. Choosing the "Artificer" proficiency on leveling may be well worth it
-- the final boss has two different decks. Each time you attack him, he will randomly choose one of it. Beating one of the decks is sufficient to win the mission; however, we do encourage you to find a deck that can defeat both decks of the final boss without changing any spells. It is hard, but it can be done!
+- the final boss has two different decks. Each time you attack him, he will randomly choose one of it. Beating one of the decks is sufficient to win the mission; however, if you like challenges, try to find a deck that can defeat both decks of the final boss without changing any spells. Even harder, try to use only the spells of your race (no pale spells either). We had a hard time, but it can be done!
 
 ## Installation
 The installation is really easy.
-Open your Etherlords II folder.
+Open your Etherlords II folder (we use version 1.03, but others should work as well).
 It contains a folder `Maps`, which again contains a folder `Custom`.
 Download all the [files](archive/master.zip) and put them into the `Maps\Custom` folder.
 Afterwards, you can play the mission by selecting Single->Mission->New and then choosing the variant you want to play.
 
 If you have any troubles with the installation, don't hesitate to contact me or make an [issue](https://github.com/aloeser/Etherlords2Map/issues).
 
-# MUST-READ FOR NON-GERMAN-SPEAKERS
-While the scripting of the campaign is done in English, all (story) dialogues and player interactions are written in German.
-The following sections provide an overview of all important dialogues.
-
-## Loot system choice
-When you start the mission, you will be asked to choose which loot system you want to use.
-In general, the loot (spells) are not fixed per monster, but rather drawn randomly from a predefined pool of spells.
-There are two versions of the loot system:
-
-- The classical version draws a certain number of spells. Press "yes" if you want to play with the classical system
-- The choice version gives you the following choice after each fight: It presents you with a set of spells that you would get as loot. You can choose to accept those (pressing "yes" at the dialogues after a fight), or you can choose to reject them. If you reject them, the system will select some (probably) different spells, which may suit you better, or not. When you reject, there is also a small chance to receive less spells than before. When you did not receive a spell from another race, you cannot receive it by rejecting the loot either. Press "no" if you want to play with the choice version
-
-## One-way teleporters
-When playing the official Etherlords campaign, I found it annoying to never know whether I would be able to return through a certain teleporter.
-For this reason, I have added a script that opens up a dialogue, requesting you to confirm the usage of the teleporter, in case it's a one-way teleporter. Press "yes" to use it, and "no" to cancel.
-
-## Lottery system
-As you progress you will encounter traders.
-They offer you some kind of lottery system: You can pay their price to obtain a spell of the trader's race (randomly drawn from a predefined list).
-You can buy at most 3 spells (or later: one artifact) per trader.
-The second purchase will be twice, the third thrice as expensive the first spell.
-If you attempt to buy more than 3 spells, you will only get a sold-out message.
-If you cannot afford a spell due to lacking resources, the trader will tell you which resources you lack.
-
-In the later parts of the game (lvl 15ish), there also is a trader that sells artefacts instead of spells.
-
-## Paleness / Colorlessness
-At some point in the story line (lvl 14ish), the antagonist will unleash paleness.
-The disturbances of the ether streams might make the monsters you encounter more dangerous, e.g., by allowing them to use spells from different races (which does happen before, but way less frequently).
-
-## Story
-This paragraph contains spoilers about the story. Do not read it if you do not want to be spoilered.
-
-
-In general, the story is heavily inspired by the Etherlords II campaign.
-Our mission is not really a prequel or sequel, but rather parallel to the campaign.
-In the campaign, each race has a certain holy shrine - e.g., the vitals have the source of life.
-At the beginning of our mission, you will witness someone stealing the shrine.
-You decide to chase the thief.
-Unfortunately for you, the thief can open (and close) gates at will, while you have to find the corresponding key first.
-From time to time, you will catch up to the thief, and he'll run away, again.
-At some point, you will recognize the antagonist as the White Lord.
-If you become too strong, the White Lord will unleash paleness to weaken you.
-The paleness will stay for the rest of the mission, but you will occasionally have access to ether nodes that restore you to full health.
-After defeating the White Lord for the first time, you realize that all you saw and defeated was his projection, as he is hiding in the outer planes.
-You win the mission if you can beat him in the outer planes.
 
 # Some thoughts on game design
 In general, this map is supposed to be hard.
@@ -131,4 +88,52 @@ I'll try to fix it as fast as I can.
 If it's crashing with a "script error" (it should not, but who knows..), it would be great if you could upload/paste the `script_err_log.txt` file found in your Etherlords II folder.
 It contains a stack trace, which will help me locate the error.
 
+
+# MUST-READ FOR NON-GERMAN SPEAKERS
+While the scripting of the campaign is done in English, all (story) dialogues and player interactions are written in German.
+The following sections provide an overview of all important dialogues.
+
+## Loot system choice
+When you start the mission, you will be asked to choose which loot system you want to use.
+In general, the loot (spells) are not fixed per monster, but rather drawn randomly from a predefined pool of spells.
+There are two versions of the loot system:
+
+- The classical version draws a certain number of spells. Press "yes" if you want to play with the classical system
+- The choice version gives you the following choice after each fight: It presents you with a set of spells that you would get as loot. You can choose to accept those (pressing "yes" at the dialogues after a fight), or you can choose to reject them. If you reject them, the system will select some (probably) different spells, which may suit you better, or not. When you reject, there is also a small chance to receive less spells than before. When you did not receive a spell from another race, you cannot receive it by rejecting the loot either. Press "no" if you want to play with the choice version
+
+## One-way teleporters
+When using teleporters, some dialogue may pop up.
+This dialogue informs you that you cannot return if you use the teleporter, i.e., that the teleporter is one-way.
+Press "yes" to use it, and "no" to cancel.
+
+## Lottery system
+As you progress you will encounter traders.
+They offer you some kind of lottery system: You can pay their price to obtain a spell from another race (randomly drawn from a predefined list).
+You can buy at most 3 spells (or later: one artifact) per trader.
+The second purchase will be twice, the third thrice as expensive as the first spell.
+If you attempt to buy more than 3 spells, you will only get a sold-out message.
+If you cannot afford a spell due to lacking resources, the trader will tell you which resources you lack.
+
+In the later parts of the game (lvl 15ish), there also is a trader that sells artefacts instead of spells.
+
+## Paleness / Colorlessness
+At some point in the story line (lvl 14ish), the antagonist will unleash paleness.
+The disturbances of the ether streams might make the monsters you encounter more dangerous, e.g., by allowing them to use spells from different races (which does happen before, but way less frequently).
+
+## Story
+**This paragraph contains spoilers about the story. Do not read it if you do not want to be spoilered.**
+
+
+In general, the story is heavily inspired by the Etherlords II campaign.
+Our mission is not really a prequel or sequel, but rather parallel to the campaign.
+In the campaign, each race has a certain holy shrine - e.g., the vitals have the source of life.
+At the beginning of our mission, you will witness someone stealing the shrine.
+You decide to chase the thief.
+Unfortunately for you, the thief can open (and close) gates at will, while you have to find the corresponding key first.
+From time to time, you will catch up to the thief, and he'll run away, again.
+At some point, you will recognize the antagonist as the White Lord.
+If you become too strong, the White Lord will unleash paleness to weaken you.
+The paleness will stay for the rest of the mission, but you will occasionally have access to ether nodes that restore you to full health.
+After defeating the White Lord for the first time, you realize that all you saw and defeated was his projection, as he is hiding in the outer planes.
+You win the mission if you can beat him in the outer planes.
 
