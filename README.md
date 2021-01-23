@@ -54,7 +54,7 @@ We believe that playing in hard mode is a good way to combine those requirements
 We can give monsters a high health to compensate for their lower level, and boost their ether generation via difficulty (on easy mode, monsters do not get ether as fast, I believe).
 
 ## Further development
-At the moment, we consider the map as finished and do not plan further development, except of fixing potentials bugs.
+At the moment, we consider the map as finished and do not plan further development, except of fixing potential bugs.
 
 If you want to translate the map to some other language, please contact me before you start.
 At the moment, all dialogue strings are hardcoded in German at the place they are used at, i.e., if someone wants to change the language, you will have to touch hundreds of lines throughout the entire script.
