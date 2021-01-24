@@ -51,19 +51,11 @@ LOOT_SYSTEM = 100001; -- large enough to no be the id of any object
 
 LOTTERY_DEFAULT_MAX_SALES = 3
 
+
 -- todos:
--- loot setup
- -- test: vitali
- -- define: kinets
--- Arena setup?
--- monster changes:
- -- maybe: swap Pi-Raten and Walking Horror
 -- script ideas
  -- i18n?
--- white lord
- -- balancing
-  -- 1-2 more decks?
--- music
+
 
 FOREIGN_LOOT_PERCENT_CHANCE = 40
 FOREIGN_LOOT_INNER_RING_PERCENT_CHANCE = 60
@@ -1621,7 +1613,7 @@ end;
 function ConfigureMapForMainHeroRace()
   assert(MAIN_HERO_RACE ~= UNITIALIZED, "MAIN_HERO_RACE is not set");
 
-  -- "configure" means simply remove superfluous objects, as all race specific objects are already on the map
+  -- "configure" simply means remove superfluous objects, as all race specific objects are already on the map
   for race_index = CHAOS, DEBUG do
     if race_index ~= MAIN_HERO_RACE then
       local objects_to_remove = RACE_SPECIFIC_OBJECTS[race_index];
@@ -1664,7 +1656,7 @@ function GenerateLoot(killed_monster_id)
   
   if getn(own_loot) + getn(foreign_loot) > 0 then
     ExSendLootMessage();
-    local QUESTION_TEXT = "Bin ich mit diesen Sprüchen zufrieden, oder möchte ich neue Sprüche? Bei neuen Sprüchen besteht das Risiko, dass es weniger Zaubersprüche werden.";
+    local QUESTION_TEXT = "Wenn ich diese Sprüche ablehne besteht das Risiko, dass es weniger Zaubersprüche werden. Möchte ich diese Sprüche behalten?";
     local grant_spells =
       function()
         for i = 1, getn(%own_loot) do
@@ -2077,7 +2069,7 @@ function InitKinetLootTable()
   AddOwnLoot(ll, "RVHL", 2); -- River Halo (0/1)
   AddOwnLoot(ll, "SEHL", 2); -- Sea Halo (1/4)
   AddOwnLoot(ll, "WLAR", 2); -- Wall of Air (0/2)
-  AddOwnLoot(ll, "WLBZ", 1); -- Wall of Breeze (0/6)
+  AddOwnLoot(ll, "WLBZ", 2); -- Wall of Breeze (0/6)
   AddOwnLoot(ll, "HUNG", 1); -- Hunger
   AddOwnLoot(ll, "CLNP", 2); -- Lesser Disenchant
   AddOwnLoot(ll, "SPWR", 1); -- Spirit of War
@@ -2086,9 +2078,10 @@ function InitKinetLootTable()
 
  -- lvl 2 spells
   ll = 2;
+  AddOwnLoot(ll, "WLBZ", 1); -- Wall of Breeze (0/6)
   AddOwnLoot(ll, "CLNP", 2); -- Water Link
   AddOwnLoot(ll, "UNSM", 2); -- Unsummon
-  AddOwnLoot(ll, "SWHL", 1); -- Swamp Halo (3/7)
+  AddOwnLoot(ll, "SWHL", 2); -- Swamp Halo (3/7)
   AddOwnLoot(ll, "SHSP", 1); -- Shaman Spirit (2/4)
   AddOwnLoot(ll, "CURS", 1); -- Curse
   AddOwnLoot(ll, "MALS", 1); -- Malison

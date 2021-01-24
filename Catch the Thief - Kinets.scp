@@ -1,0 +1,2606 @@
+-- ##############################################################################
+-- #                           GLOBAL VARIABLES/CONSTANTS                       #
+-- ##############################################################################
+
+UNITIALIZED = -1
+
+-- IDs that are used for races and locations
+HOME = 0
+CHAOS = 1
+KINET = 2
+SYNTHET = 3
+VITALI = 4
+COLORLESS = 5
+DEBUG = 6
+
+-- IDs of the four main heroes (you can play only one at a time)
+MAIN_HERO_CHAOS = 4082
+MAIN_HERO_KINET = 4414
+MAIN_HERO_SYNTHET = 3951
+MAIN_HERO_VITALI = 3926
+MAIN_HERO_DEBUG = 4418
+
+-- Main hero race. Will be initialised during Local_Hook_GameStarted()
+MAIN_HERO_RACE = UNITIALIZED
+
+-- Final boss
+WHITE_LORD = 2464
+WHITE_LORD_PORTAL = 4417
+WHITE_LORD_STRONG = 4419
+
+SYSTEM = 5623 -- Only used for the cluster image in dialogues
+
+-- List of monster IDs that need colorlessness tolerance
+COLORLESSNESS_TOLERANT_MONSTERS = { 786, 2414, 2426, 2430, 2431, 2463, 2464, 2524, 2979, 2982, 2987, 2988, 2991, 2993, 2994, 3254, 4424, 5596, 5752, MAIN_HERO_DEBUG}
+
+WHITE_LORD_DECKS = 
+{
+ -- deck 1 - Depri Gas + Delusion + Burning Graves and Mechozauruses
+  { "BRGR", "BRGR", "OCRP", "DELS", "DELS", "DPGS", "DPGS", "EXIL", "FRNT", "IRMZ", "IRMZ", "CLNP", "CLNP", "STMZ", "STMZ", "ENBR" },
+
+ -- deck 2 - Ether Channels + Tap Life
+  { "OCRP", "EXIL", "CLNP", "CLNP", "LSPC", "LSPC", "LQRL", "LQRL", "LQRL", "TPLF", "TPLF", "TPLF", "TPLF", "WLBL", "WLBL", "WNFL" },
+
+}
+
+
+GAME_LOADED = false
+
+
+LOOT_SYSTEM = 100001; -- large enough to no be the id of any object
+
+LOTTERY_DEFAULT_MAX_SALES = 3
+
+
+-- todos:
+-- script ideas
+ -- i18n?
+
+
+FOREIGN_LOOT_PERCENT_CHANCE = 40
+FOREIGN_LOOT_INNER_RING_PERCENT_CHANCE = 60
+MAX_SPELL_DROP_COUNT = 3
+DEFAULT_PROXIMITY_TRIGGER_DISTANCE = 3
+
+
+ONE_WAY_TELEPORTERS = { 191, 3642, 194, 3974, 193, 5483, 192, 5066, 925, 1381, 1411, 1659, 1676, 1763, 1605, 2178, 190, 4954, 182, 302, 309, 303, 310, 304, 311 };
+
+-- List of race-specific objects
+RACE_SPECIFIC_OBJECTS =
+{
+  -- CHAOS
+  {
+    -- shops
+    3941, 4392, 4391, 4389, 4388,
+
+    -- specializations
+    4393, 4394, 4395,
+
+    -- power nodes
+    2466, 2496, 2532, 2552, 2976,
+
+    -- beacons
+    2997, 3000, 3003, 3006
+  },
+
+  -- KINET
+  {
+    -- shops
+    3940, 5610, 5612, 5615, 5616,
+
+    -- specializations
+    5606, 5607, 5609,
+
+    -- power nodes
+    2467, 2495, 2530, 2550, 2974,
+
+    -- beacons
+    2998, 3001, 3004, 3007
+  },
+
+  -- SYNTHET
+  {
+    -- shops
+    3944, 3946, 3949, 3950, 3942,
+
+    -- specializations
+    3162, 3163, 3166,
+
+    -- power nodes
+    2468, 2493, 2529, 2549, 2973,
+
+    -- beacons
+    2999, 3002, 3005, 3008
+  },
+
+  -- VITALI
+  {
+    -- shops
+    819, 1336, 1764, 2077, 3939,
+
+    -- specializations
+    1028, 1424, 2180,
+
+    -- power nodes
+    2465, 2494, 2531, 2551, 2975,
+
+    -- beacons
+    1220, 1293, 2558, 2559
+  },
+
+  -- COLORLESS- do not use
+  {},
+
+  -- DEBUG
+  {
+    -- shops
+    4421,
+    
+    -- teleporters
+    2031, 2032
+  } 
+}
+
+-- ##############################################################################
+-- #                                  DEBUG STUFF                               #
+-- ##############################################################################
+
+function InitializeDebug()
+  ExAddResources(1, 1000, 500, 200);
+
+  local specs = {"IRSK", "GSNV"};
+  for i = 1, getn(specs) do
+    ExGiveNewSpecialization(MAIN_HERO_DEBUG, specs[i]);
+  end
+end
+
+-- ##############################################################################
+-- #                              ARTEFACT SETUP                                #
+-- ##############################################################################
+
+-- Enter each monster that should have an artefact in the function below
+function InitializeArtefacts()
+  -- Artefacts used by monsters and/or heroes
+  local HUNTRESS = "AmuletOfHeroes";
+  local COLOSSUS = "RodofColossus";
+  local KONUNG = "RodofKnights";
+  local INSANITY = "RodOfInsanity";
+  local RESURRECTION = "RodOfRessurection";
+  local MAGGOT = "ScrollOfMaggots";
+  local DESTRUCTION = "SpikedRing";
+  local ETHER_DEFENSE = "EtherAmulet";
+  local UNITY = "AmuletOfWar";
+  local HEALING = "RingOfHealing";
+  local PARALYZATION = "RingOfParalyzation";
+  local COMMAND = "RingOfCommand";
+  local SPELLBREAKER = "SpellBreaker";
+
+  -- Add the artefacts to monsters. I am not aware of a way to set this within the editor
+  local debug_artefacts = { COLOSSUS, KONUNG, INSANITY, RESURRECTION, MAGGOT, DESTRUCTION, ETHER_DEFENSE, UNITY, HEALING, PARALYZATION, HUNTRESS, COMMAND };
+  AddArtefactsToHero(MAIN_HERO_DEBUG, debug_artefacts);
+
+  local white_lord_artefacts = { COLOSSUS, KONUNG, DESTRUCTION };
+  AddArtefactsToHero(WHITE_LORD_STRONG, white_lord_artefacts);
+
+  local hoppers = { 775,  3551, 3910, 4100 };
+  for i = 1, getn(hoppers) do
+    AddArtefactToHero(hoppers[i], HEALING);
+  end
+
+  local ORC_GUARD = 1174;
+  AddArtefactToHero(ORC_GUARD, MAGGOT);
+
+  local KOBOLD_ELDER = 1179;
+  AddArtefactToHero(KOBOLD_ELDER, INSANITY);
+
+  local EARTH_ELEMENT = 1454;
+  AddArtefactToHero(EARTH_ELEMENT, DESTRUCTION);
+
+  local CYCLOPS = 5753;
+  AddArtefactToHero(CYCLOPS, ETHER_DEFENSE);
+
+  local ROOOBERT = 2069;
+  AddArtefactToHero(ROOOBERT, UNITY);
+
+  local I_LIKE_BEES = 2067;
+  AddArtefactToHero(I_LIKE_BEES, UNITY);
+
+  local EVIL_EYE_MOTHER = 2269;
+  AddArtefactToHero(EVIL_EYE_MOTHER, PARALYZATION);
+
+  local MAXI_HOPPER = 2497;
+  AddArtefactToHero(MAXI_HOPPER, UNITY);
+  AddArtefactToHero(MAXI_HOPPER, UNITY); -- this is intentionally added twice
+
+  local WALL_OF_BLADES = 5603;
+  AddArtefactToHero(WALL_OF_BLADES, COLOSSUS);
+ 
+  local CARNIVOROUS_FINGUS = 2987;
+  AddArtefactToHero(CARNIVOROUS_FINGUS, UNITY);
+
+  local INFECTED_FINGUS = 4941;
+  AddArtefactToHero(INFECTED_FINGUS, SPELLBREAKER);
+
+  local GREEN_DRAGON = 2977;
+  AddArtefactToHero(GREEN_DRAGON, HUNTRESS);
+
+  local KONUNG_ENEMY = 325;
+  AddArtefactToHero(KONUNG_ENEMY, KONUNG);
+  AddArtefactToHero(KONUNG_ENEMY, KONUNG); -- this is intentionally added twice
+
+  local STEEL_MECHOZAURUS = 2978;
+  AddArtefactToHero(STEEL_MECHOZAURUS, COMMAND);
+
+  local DIAMANDA = 2426;
+  local DIAMANDA_ARTEFACTS = { COMMAND, ETHER_DEFENSE };
+  AddArtefactsToHero(DIAMANDA, DIAMANDA_ARTEFACTS);
+end
+
+-- Helper function to add a single artefact to a hero
+function AddArtefactToHero(hero_id, artefact)
+  ExAddArtefact(hero_id, artefact);
+end
+
+-- Helper function to add a list of artefacts to a hero
+function AddArtefactsToHero(hero_id, artefacts)
+  for i = 1, getn(artefacts) do
+    AddArtefactToHero(hero_id, artefacts[i]);
+  end
+end
+
+
+
+-- ##############################################################################
+-- #                            PROXIMITY TRIGGERS                              #
+-- ##############################################################################
+
+function RegisterProximityTriggers()
+  OnApproach(WHITE_LORD, WhiteLordAction);
+
+  local ALTAR_OF_CHAOS = 5561;
+  OnApproach(ALTAR_OF_CHAOS, WhiteLordAction, 10);
+
+  local SHRINE_OF_ORDERING = 5549;
+  OnApproach(SHRINE_OF_ORDERING, WhiteLordAction, 7);
+
+  local SHRINE_OF_SYNTHESIS = 5485;
+  OnApproach(SHRINE_OF_SYNTHESIS, WhiteLordAction);
+
+  local SOURCE_OF_LIFE = 5086;
+  OnApproach(SOURCE_OF_LIFE, WhiteLordAction, 10);
+
+  local TRIGGER_STONE = 5559;
+  local lambda =
+    function()
+      if GetState(WHITE_LORD) == STATE_WL_PALENESS_UNLEASHED then
+	WhiteLordAction();
+      end
+    end;
+  OnApproach(TRIGGER_STONE, lambda);
+
+  RegisterShrineMonsterTriggers();
+end
+
+function OnApproach(monster_id, callback, trigger_range)
+  local n = getn(PROXIMITY_TRIGGERS);
+  trigger_range = trigger_range or DEFAULT_PROXIMITY_TRIGGER_DISTANCE;
+  PROXIMITY_TRIGGERS[n+1] = { monster_id, trigger_range, callback };
+end
+
+
+-- ##############################################################################
+-- #                           SHRINE MONSTER TRIGGERS                          #
+-- ##############################################################################
+
+-- shrine monster triggers are special proximity triggers
+
+function RegisterShrineMonsterTriggers()
+   local VAMPIRE_BAT = 2060;
+   local SHRINE_FLYING = 4444;
+   local FLYING_AFFECT = "Flood";
+   OnApproachActivateShrine(VAMPIRE_BAT, SHRINE_FLYING, FLYING_AFFECT, "Flapp flapp..");
+
+   local TICK_MOTHER = 2246;   
+   local SHRINE_TICK_SWARM = 4441;
+   local TICK_AFFECT = "TickSwarm";
+   OnApproachActivateShrine(TICK_MOTHER, SHRINE_TICK_SWARM, TICK_AFFECT, "Ruft die Krieger!");
+
+   local ANCIENT_TREANT = 2410;
+   local SHRINE_TREANT = 4443;
+   local TREANT_EFFECT = "TreantsLuck"
+   OnApproachActivateShrine(ANCIENT_TREANT, SHRINE_TREANT, TREANT_EFFECT, "Knarz..");
+
+   local INFECTED_FINGUS = 4941;
+   local SHRINE_FINGUS = 4927;
+   local FINGUS_AFFECT = "FingusMalady";
+   OnApproachActivateShrine(INFECTED_FINGUS, SHRINE_FINGUS, FINGUS_AFFECT, "Es ist ansteckend..");
+
+   local DOOM_RAT = 5596;
+   local SHRINE_RAT = 5599;
+   local RAT_AFFECT = "RatHoles";
+   OnApproachActivateShrine(DOOM_RAT, SHRINE_RAT, RAT_AFFECT, "Quiek..");
+
+   local BLUE_DRAGON = 2463;
+   local SHRINE_ICESTORM = 4442;
+   local ICESTORM_AFFECT = "TempleFrostWind";
+   OnApproachActivateShrine(BLUE_DRAGON, SHRINE_ICESTORM, ICESTORM_AFFECT, "Es kommt ein Sturm auf..");
+end
+
+function OnApproachActivateShrine(monster_id, shrine_id, shrine_affect, message)
+  ExSetUsability(shrine_id, false);
+
+  -- Activate shrine on approach
+  local activate_shrine = 
+    function()
+      if not HasAffect(%monster_id, %shrine_affect) and ExGetCommandQueueSize() == 0 then
+        ExSoftAbortCmd(MAIN_HERO_ID);
+        ExAbortAllCommand();
+        ExAddCommandCameraAttach(true);
+        ExAddCommandCameraToObject(%monster_id);
+
+        if %message ~= nil then
+          ExAddCommandText(%monster_id, %message, false);
+        end
+
+        ExAddCommandExecuteScriptFunction("ExSetUsability", %shrine_id, true);
+        local x, y = ExGetPos(%monster_id);
+        ExAddCommandMoveAndUseObject(%monster_id, %shrine_id);
+	ExAddCommandMoving(%monster_id, x, y);
+        ExAddCommandMobOrientToObject(%monster_id, MAIN_HERO_ID);
+        ExAddCommandCameraToObject(MAIN_HERO_ID);
+        ExAddCommandCameraAttach(false);
+        ExAddCommandExecuteScriptFunction("ExSetUsability", %shrine_id, false);
+      end
+    end;
+  OnApproach(monster_id, activate_shrine);  
+
+  -- Forbid fighting the monster without affect
+  local forbid_fighting_without_affect = 
+    function()
+      if HasAffect(%monster_id, %shrine_affect) then
+        return USABLE;
+      else
+        return NOT_USABLE;
+      end
+    end;
+  OnUse(monster_id, MAIN_HERO_ID, forbid_fighting_without_affect);
+end
+
+function HasAffect(hero_id, name)
+  for i = 1, ExGetAffectCount(hero_id) do
+	local affect_name, _ = ExGetAffectByIndex(hero_id, i-1);
+	if affect_name == name then
+		return true;
+	end
+  end
+  return false;
+end
+
+-- ##############################################################################
+-- #                             ON KILL TRIGGERS                               #
+-- ##############################################################################
+
+function OnKill(monster_id, callback)
+  local n = getn(KILL_TRIGGERS);
+  KILL_TRIGGERS[n+1] = { monster_id, callback };
+end
+
+function RegisterKillTriggers()
+  -- On killing the first White Lord, he opens a portal and retreats in the outer plane
+  local state_transition_first_white_lord_defeated = 
+    function()
+      local state = GetState(WHITE_LORD);
+      assert(state == STATE_WL_DIAMANDA_SUMMONED, "Wrong White Lord state: " .. tostring(state));
+
+      SetState(WHITE_LORD, STATE_WL_DEFEATED);
+      WhiteLordAction();
+    end;
+  OnKill(WHITE_LORD, state_transition_first_white_lord_defeated);
+
+  -- On Killing the second White Lord, you win the game and the outro is played
+  local state_transition_second_white_lord_defeated =
+    function()
+      local state = GetState(WHITE_LORD);
+      assert(state == STATE_WL_FLED_INTO_OUTER_REALM, "Wrong White Lord state: " .. tostring(state));
+
+      SetState(WHITE_LORD, STATE_WL_KILLED);
+      WhiteLordAction();
+    end;
+  OnKill(WHITE_LORD_STRONG, state_transition_second_white_lord_defeated);
+
+  -- Automatically collect keys so that the player cannot forget them
+  RegisterOnKillTakeKeyTriggers();
+end
+
+function OnKillTakeKey(monster_id, key_id, message)
+  local lambda = 
+    function()
+      ExAddCommandMoveAndUseObject(MAIN_HERO_ID, %key_id);
+      if %message ~= nil then
+        ExAddCommandText(MAIN_HERO_ID, %message, true);
+      end
+    end
+  OnKill(monster_id, lambda);
+end
+
+function RegisterOnKillTakeKeyTriggers()
+  local HOME_EXIT_MESSAGE = "Perfekt! Dieser Schlüssel öffnet das Tor, durch das ich mein Heimatland verlassen kann.";
+
+  local PALE_AVENGER = 3923;
+  local CHAOS_HOME_EXIT = 3641;
+  OnKillTakeKey(PALE_AVENGER, CHAOS_HOME_EXIT, HOME_EXIT_MESSAGE);
+
+  local WARRIOR_SPIRIT = 4411;
+  local KINET_HOME_EXIT = 3952;
+  OnKillTakeKey(WARRIOR_SPIRIT, KINET_HOME_EXIT, HOME_EXIT_MESSAGE);
+
+  local CHIRURG = 3565;
+  local SYNTHET_HOME_EXIT = 3048;
+  OnKillTakeKey(CHIRURG, SYNTHET_HOME_EXIT, HOME_EXIT_MESSAGE);
+
+  local NAGINI_JUNIOR = 768;
+  local VITALI_HOME_EXIT = 403;
+  OnKillTakeKey(NAGINI_JUNIOR, VITALI_HOME_EXIT, HOME_EXIT_MESSAGE);
+
+  local BARNARD = 1457;
+  local KINET_OUTER_EXIT = 1392;
+  local KINET_OUTER_KEY_TEXT = "Ein Schlüssel.. wofür der wohl gut ist?";
+  OnKillTakeKey(BARNARD, KINET_OUTER_EXIT, KINET_OUTER_KEY_TEXT);
+
+  local MALE_FIGHTER = 849;
+  local INNER_RING_ENTRY = 187;
+  local INNER_RING_KEY_TEXT = "Endlich! Jetzt kann ich dem Dieb weiter folgen.";
+  OnKillTakeKey(MALE_FIGHTER, INNER_RING_ENTRY, INNER_RING_KEY_TEXT);
+
+  local PAIN = 2982;
+  local DOCK_PAIN = 2556;
+  local LAST_SHOP_KEY = 2557;
+  local LAST_SHOP_TEXT = "Diesen Schlüssel kann ich bestimmt gleich verwenden.";
+  local use_port = 
+    function()
+      ExAddCommandMoveAndUseObject(MAIN_HERO_ID, %DOCK_PAIN);
+    end
+  OnKill(PAIN, use_port);
+  OnKillTakeKey(PAIN, LAST_SHOP_KEY, LAST_SHOP_TEXT);
+end
+
+-- ##############################################################################
+-- #                              ON USE TRIGGERS                               #
+-- ##############################################################################
+function OnUse(object_id, hero_id, callback)
+  local n = getn(USE_TRIGGERS);
+  USE_TRIGGERS[n+1] = { object_id, hero_id, callback };
+end
+
+function RegisterUseTriggers()
+  -- Request confirmation before using one-way teleporters
+  for i = 1, getn(ONE_WAY_TELEPORTERS) do
+    RegisterOneWayTeleporter(ONE_WAY_TELEPORTERS[i]);
+  end
+
+  -- Register lotteries
+  RegisterLotteries();
+
+  -- Upon unlocking the gate to the inner ring, unleash paleness
+  local GATE_INNER_RING = 186;
+  local use_gate =
+    function()
+      local state = GetState(WHITE_LORD);
+      assert(state == STATE_WL_FLED_INTO_INNER_RING, "Wrong White Lord State: " .. tostring(state));
+
+      WhiteLordAction();
+      return USABLE;
+    end
+  OnUse(GATE_INNER_RING, MAIN_HERO_ID, use_gate);
+
+  -- Make the White Lord only attackable when he is in the correct state
+  local white_lord_attackable =
+    function()
+      if WhiteLordIsAttackable() then
+        return USABLE;
+      else
+        return NOT_USABLE;
+      end 
+    end
+  OnUse(WHITE_LORD, MAIN_HERO_ID, white_lord_attackable);
+
+  -- When clicking the White Lord portal, choose a random white lord deck and start the remote fight
+  local white_lord_remote_fight = 
+    function()
+      local state = GetState(WHITE_LORD);
+      assert(state == STATE_WL_FLED_INTO_OUTER_REALM);
+
+      UseWhiteLordDeck(random(1,getn(WHITE_LORD_DECKS)));
+      AddCommandRemoteFight(WHITE_LORD_STRONG);
+      return NOT_USABLE;
+    end
+  OnUse(WHITE_LORD_PORTAL, MAIN_HERO_ID, white_lord_remote_fight);
+end
+
+-- ##############################################################################
+-- #                           ONE WAY TELEPORTERS                              #
+-- ##############################################################################
+
+STATE_TELEPORTER_USAGE_NOT_CONFIRMED = 0;
+STATE_TELEPORTER_USAGE_CONFIRMED = 1;
+
+function RegisterOneWayTeleporter(teleporter_id)
+  local lambda = 
+    function()
+      local consent_state = GetState(%teleporter_id);
+      if consent_state == STATE_TELEPORTER_USAGE_NOT_CONFIRMED then
+        AddCommandRequestOneWayTeleportUsageConfirmation(%teleporter_id);
+        return NOT_USABLE;
+      elseif consent_state == STATE_TELEPORTER_USAGE_CONFIRMED then
+        return USABLE;
+      else
+        error("Unknown teleporter consent state: " .. tostring(consent_state));
+      end
+    end;
+  OnUse(teleporter_id, MAIN_HERO_ID, lambda);
+end
+
+function AddCommandRequestOneWayTeleportUsageConfirmation(teleport_id)
+  local ONE_WAY_TELEPORTER_TEXT = "Wenn ich diesen Teleporter benutze, werde ich nicht mehr umkehren können. Soll ich den Teleporter benutzen?";
+  local ON_YES = 
+    function()
+      AddCommandSetState(%teleport_id, STATE_TELEPORTER_USAGE_CONFIRMED);
+      ExAddCommandMoveAndUseObject(MAIN_HERO_ID, %teleport_id);
+      AddCommandSetState(%teleport_id, STATE_TELEPORTER_USAGE_NOT_CONFIRMED);
+    end;
+  AddCommandAskQuestion(MAIN_HERO_ID, ONE_WAY_TELEPORTER_TEXT, ON_YES, nil);
+end
+
+-- ##############################################################################
+-- #                              QUESTION ASKING                               #
+-- ##############################################################################
+
+QUESTION_CALLBACKS = nil;
+
+STATE_NOT_ASKING_QUESTION = 0;
+STATE_ASKING_QUESTION = 1;
+QUESTION_STATE = STATE_NOT_ASKING_QUESTION;
+
+function AddCommandAskQuestion(hero_id, question, yes_callback, no_callback, write_to_notebook)
+  local write_to_notebook = write_to_notebook or false;
+  AddCommandSetState(QUESTION_STATE, STATE_ASKING_QUESTION);
+  AddCommandSetQuestionCallbacks(yes_callback, no_callback);
+  ExAddCommandQuestion(hero_id, question, write_to_notebook);
+  AddCommandSetState(QUESTION_STATE, STATE_NOT_ASKING_QUESTION);
+end
+
+
+-- Ugly hack here: We cannot call ExAddCommandExecuteScriptFunction with lambdas as parameters, so store them in an extra variable assign right now and assign them when requested.
+QUESTION_ID = 1;
+QUESTION_CALLBACKS_LIST = {};
+function AddCommandSetQuestionCallbacks(yes_callback, no_callback)
+  QUESTION_CALLBACKS_LIST[QUESTION_ID] = { yes_callback, no_callback };
+  ExAddCommandExecuteScriptFunction("SetQuestionCallbacks", QUESTION_ID);
+  QUESTION_ID = QUESTION_ID + 1;
+end
+
+function SetQuestionCallbacks(question_id)
+   QUESTION_CALLBACKS = QUESTION_CALLBACKS_LIST[question_id];
+end
+
+-- ##############################################################################
+-- #                           WHITE LORD SCRIPTING                             #
+-- ##############################################################################
+
+STATE_WL_NOTHING_DONE = 0;
+STATE_WL_SHRINE_STOLEN = 1;
+STATE_WL_FLED_INTO_INNER_RING = 2;
+STATE_WL_PALENESS_UNLEASHED = 3;
+STATE_WL_DIAMANDA_SUMMONED = 4;
+STATE_WL_DEFEATED = 5;
+STATE_WL_FLED_INTO_OUTER_REALM = 6;
+STATE_WL_KILLED = 7;
+
+function WhiteLordAction()
+  local state = GetState(WHITE_LORD);
+
+  if state == STATE_WL_NOTHING_DONE then
+    WhiteLordStealShrine();
+  elseif state == STATE_WL_SHRINE_STOLEN then
+    WhiteLordFleeInnerRing();
+  elseif state == STATE_WL_FLED_INTO_INNER_RING then
+    WhiteLordUnleashPaleness();
+  elseif state == STATE_WL_PALENESS_UNLEASHED then
+     WhiteLordSummonDiamanda();
+  elseif state == STATE_WL_DIAMANDA_SUMMONED then
+    -- Nothing to do. State will be advanced when the White Lord is "killed" for the first time
+  elseif state == STATE_WL_DEFEATED then
+    WhiteLordFleeOuterRealm();
+  elseif state == STATE_WL_FLED_INTO_OUTER_REALM then
+    -- Nothing to do. State will be advanced when the White Lord is killed for the second time
+  elseif state == STATE_WL_KILLED then
+    WhiteLordOutro();
+  else
+    error("Unhandled white lord state: " .. tostring(state));
+  end
+end
+
+function FastForwardWhiteLordStateTo(target_state)
+  local state = GetState(WHITE_LORD);
+  while state < target_state do
+    if state == STATE_WL_NOTHING_DONE then
+      WhiteLordStealShrine(true);
+    elseif state == STATE_WL_SHRINE_STOLEN then
+      WhiteLordFleeInnerRing(true);
+    elseif state == STATE_WL_FLED_INTO_INNER_RING then
+      WhiteLordUnleashPaleness(true);
+    elseif state == STATE_WL_PALENESS_UNLEASHED then
+      WhiteLordSummonDiamanda(true);
+    elseif state == STATE_WL_DIAMANDA_SUMMONED then
+      -- nothing to do
+    elseif state == STATE_WL_DEFEATED then
+      WhiteLordFleeOuterRealm(true);
+    else
+      error("Cannot fast-forward White Lord state to " .. tostring(target_state));
+    end
+
+    SetState(WHITE_LORD, state + 1);
+    state = GetState(WHITE_LORD);
+  end
+end
+
+function WhiteLordStealShrine(fast_forward)
+  fast_forward = fast_forward or false;
+
+  local state = GetState(WHITE_LORD);
+  assert(state == STATE_WL_NOTHING_DONE, "White Lord is in state " .. tostring(state));
+
+  if MAIN_HERO_RACE == CHAOS then
+    WhiteLordStealShrineChaos(fast_forward);
+  elseif MAIN_HERO_RACE == KINET then
+    WhiteLordStealShrineKinet(fast_forward);
+  elseif MAIN_HERO_RACE == SYNTHET then
+    WhiteLordStealShrineSynthet(fast_forward);
+  elseif MAIN_HERO_RACE == VITALI then
+    WhiteLordStealShrineVitali(fast_forward);
+  elseif MAIN_HERO_RACE == DEBUG then
+    -- nothing to do here
+  else
+    error("Unknown MAIN_HERO_RACE: " .. tostring(MAIN_HERO_RACE));
+  end
+
+  ExAddCommandJumpToPos(WHITE_LORD, 183, 128);
+  ExAddCommandMobOrient(WHITE_LORD, 1, 0);
+  AddCommandSetState(WHITE_LORD, STATE_WL_SHRINE_STOLEN);
+end
+
+function WhiteLordStealShrineChaos(fast_forward)
+  local TELEPORT_TO = 5545;
+  local TELEPORT_FROM = 5544;
+  local HOLY_SHRINE = 5561;
+
+  if fast_forward then
+    ExAddCommandTakeObject(HOLY_SHRINE);
+    ExAddCommandTakeObject(TELEPORT_TO);
+    ExAddCommandTakeObject(TELEPORT_FROM);
+    return;
+  end
+
+  local GATE = 3640;
+  local HOLY_SHRINE_TEXT = "Ahh! Der Altar des Chaos, heiliger Ort der Chaosianer. Ich spüre die Kraft der Flammen!";
+  local WHO_ARE_YOU_TEXT = "Hey! Dieser Platz ist heilig! Was machst du da?!";
+  local STOP_IT_TEXT = "Hör sofort auf damit!";
+  local NOO_TEXT = "NEIN!!!";
+  local NEED_TO_BRING_IT_BACK_TEXT = "Dieser Unhold! Ich werde den Altar des Chaos zurückbringen.";
+  local KEY = 3641;
+  local KEY_LOCATION_TEXT = "Der Schlüssel für das Tor befindet sich in Sichtweite, aber der direkte Weg dorthin ist durch Lava versperrt. Ich muss einen anderen Weg finden!";
+
+
+
+  -- Intro
+  ExAddCommandCameraAttach(true);
+  ExAddCommandMoving(MAIN_HERO_ID, 219, 209);
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, HOLY_SHRINE_TEXT, true);
+
+  -- White Lord arrives and walks to the shrine
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_TO);
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandExecuteScriptFunction("ExOpenGate", GATE);
+  ExAddCommandMoving(WHITE_LORD, 219, 206);
+  ExAddCommandMobOrientToObject(WHITE_LORD, HOLY_SHRINE);
+
+  -- Hero talks to him
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, WHITE_LORD);
+  ExAddCommandText(MAIN_HERO_ID, WHO_ARE_YOU_TEXT, true);
+
+  -- White Lords casts lightnings and "destroys" the shrine  
+  ExAddCommandCameraToObject(HOLY_SHRINE, false);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, STOP_IT_TEXT, true);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandTakeObject(HOLY_SHRINE);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NOO_TEXT, true);
+
+  -- White Lord retreats
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 225, 207);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandMoving(MAIN_HERO_ID, 221, 207);
+  ExAddCommandMobOrient(MAIN_HERO_ID, 1, 0);
+  ExAddCommandMobOrient(WHITE_LORD, -1, 0);
+  ExAddCommandWait(250);
+  ExAddCommandExecuteScriptFunction("ExCloseGate", GATE);
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_FROM);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NEED_TO_BRING_IT_BACK_TEXT, true);
+  ExAddCommandCameraAttach(false);
+  local x, y = ExGetPos(KEY);
+  ExAddCommandStartObservation("key_observation", x, y, 4);
+  ExAddCommandCameraToObject(KEY, false);  
+  ExAddCommandText(MAIN_HERO_ID, KEY_LOCATION_TEXT, true);
+  ExAddCommandFinishObservation("key_observation");
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+
+  -- Clean up
+  ExAddCommandTakeObject(TELEPORT_TO);
+  ExAddCommandTakeObject(TELEPORT_FROM);
+end
+
+function WhiteLordStealShrineKinet(fast_forward)
+  local HOLY_SHRINE = 5549;
+  local TELEPORT_TO = 5548;
+  local TELEPORT_FROM = 5547;
+
+  if fast_forward then
+    ExAddCommandTakeObject(HOLY_SHRINE);
+    ExAddCommandTakeObject(TELEPORT_TO);
+    ExAddCommandTakeObject(TELEPORT_FROM);
+    return;
+  end
+
+  local GATE = 3953;
+  local HOLY_SHRINE_TEXT = "Ahh! Der Schrein der Ordnung, heiliger Ort der Kineten. Kann es einen besseren Ort für meine Kalligraphie-Übungen geben?";
+  local WHO_ARE_YOU_TEXT = "Hey! Dieser Platz ist heilig! Was machst du da?!";
+
+  local STOP_IT_TEXT = "Hör sofort auf damit!";
+  local NOO_TEXT = "NEIN!!!";
+  local NEED_TO_BRING_IT_BACK_TEXT = "Dieser Unhold! Ich werde den Schrein der Ordnung zurückbringen.";
+  local KEY = 3952;
+  local KEY_LOCATION_TEXT = "Der Schlüssel für das Tor befindet sich im Süden unseres Landes. Ich muss einen Weg dorthin finden!";
+
+  -- Intro
+  ExAddCommandCameraAttach(true);
+  ExAddCommandMoving(MAIN_HERO_ID, 23, 224);
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, HOLY_SHRINE_TEXT, true);
+
+  -- White Lord arrives and walks to the shrine
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_TO);
+  ExAddCommandExecuteScriptFunction("ExOpenGate", GATE);
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 24, 222);
+  ExAddCommandMobOrientToObject(WHITE_LORD, HOLY_SHRINE);
+
+  -- Hero talks to him
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, WHITE_LORD);
+  ExAddCommandText(MAIN_HERO_ID, WHO_ARE_YOU_TEXT, true);
+
+  -- White Lords casts lightnings and "destroys" the shrine  
+  ExAddCommandCameraToObject(HOLY_SHRINE, false);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, STOP_IT_TEXT, true);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandTakeObject(HOLY_SHRINE);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NOO_TEXT, true);
+
+  -- White Lord retreats
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 26, 223);
+  ExAddCommandMoving(WHITE_LORD, 26, 230);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandMoving(MAIN_HERO_ID, 26, 227);
+  ExAddCommandMobOrient(MAIN_HERO_ID, 0, 1);
+  ExAddCommandMobOrient(WHITE_LORD, 0, -1);
+  ExAddCommandWait(250);
+  ExAddCommandExecuteScriptFunction("ExCloseGate", GATE);
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_FROM);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NEED_TO_BRING_IT_BACK_TEXT, true);
+  ExAddCommandCameraAttach(false);
+  local x, y = ExGetPos(KEY);
+  ExAddCommandStartObservation("key_observation", x, y, 4);
+  ExAddCommandCameraToObject(KEY, false);  
+  ExAddCommandText(MAIN_HERO_ID, KEY_LOCATION_TEXT, true);
+  ExAddCommandFinishObservation("key_observation");
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+
+  -- Clean up
+  ExAddCommandTakeObject(TELEPORT_TO);
+  ExAddCommandTakeObject(TELEPORT_FROM);
+end
+
+function WhiteLordStealShrineSynthet(fast_forward)
+  local HOLY_SHRINE = 5485;
+  local TELEPORT_TO = 5535;
+  local TELEPORT_FROM = 5536;
+
+  if fast_forward then
+    ExAddCommandTakeObject(HOLY_SHRINE);
+    ExAddCommandTakeObject(TELEPORT_TO);
+    ExAddCommandTakeObject(TELEPORT_FROM);
+    return;
+  end
+
+  local GATE = 3047;
+  local HOLY_SHRINE_TEXT = "Ahh! Der Schrein der Synthese, heiliger Ort der Syntheten. Die Quelle der Macht der Syntheten!";
+  local WHO_ARE_YOU_TEXT = "Hey! Dieser Platz ist heilig! Was machst du da?!";
+  local STOP_IT_TEXT = "Hör sofort auf damit!";
+  local NOO_TEXT = "NEIN!!!";
+  local NEED_TO_BRING_IT_BACK_TEXT = "Dieser Unhold! Ich werde den Schrein der Synthese zurückbringen.";
+  local KEY = 3048;
+  local KEY_LOCATION_TEXT = "Der Schlüssel für das Tor befindet sich in Sichtweite, aber der direkte Weg dorthin ist durch Felsen versperrt. Ich muss einen anderen Weg finden!";
+
+  -- Intro
+  ExAddCommandCameraAttach(true);
+  ExAddCommandMoving(MAIN_HERO_ID, 21, 19);
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, HOLY_SHRINE_TEXT, true);
+
+  -- White Lord arrives and walks to the shrine
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_TO);
+  ExAddCommandExecuteScriptFunction("ExOpenGate", GATE);
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 23, 17);
+  ExAddCommandMoving(WHITE_LORD, 20, 17);
+  ExAddCommandMobOrientToObject(WHITE_LORD, HOLY_SHRINE);
+
+  -- Hero talks to him
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, WHITE_LORD);
+  ExAddCommandText(MAIN_HERO_ID, WHO_ARE_YOU_TEXT, true);
+
+  -- White Lords casts lightnings and "destroys" the shrine  
+  ExAddCommandCameraToObject(HOLY_SHRINE, false);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, STOP_IT_TEXT, true);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandTakeObject(HOLY_SHRINE);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NOO_TEXT, true);
+
+  -- White Lord retreats
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 25, 24);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandMoving(MAIN_HERO_ID, 25, 20);
+  ExAddCommandMobOrient(MAIN_HERO_ID, 0, 1);
+  ExAddCommandMobOrient(WHITE_LORD, 0, -1);
+  ExAddCommandWait(250);
+  ExAddCommandExecuteScriptFunction("ExCloseGate", GATE);
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_FROM);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NEED_TO_BRING_IT_BACK_TEXT, true);
+  ExAddCommandCameraAttach(false);
+  local x, y = ExGetPos(KEY);
+  ExAddCommandStartObservation("key_observation", x, y, 4);
+  ExAddCommandCameraToObject(KEY, false);  
+  ExAddCommandText(MAIN_HERO_ID, KEY_LOCATION_TEXT, true);
+  ExAddCommandFinishObservation("key_observation");
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+
+  -- Clean up
+  ExAddCommandTakeObject(TELEPORT_TO);
+  ExAddCommandTakeObject(TELEPORT_FROM);
+end
+
+function WhiteLordStealShrineVitali(fast_forward)
+  local HOLY_SHRINE = 5086;
+  local TELEPORT_TO = 5510;
+  local TELEPORT_FROM = 5509;
+
+  if fast_forward then
+    ExAddCommandTakeObject(HOLY_SHRINE);
+    ExAddCommandTakeObject(TELEPORT_TO);
+    ExAddCommandTakeObject(TELEPORT_FROM);
+    return;
+  end
+
+  local GATE = 5079;
+  local HOLY_SHRINE_TEXT = "Ahh! Die Quelle des Lebens, heiliger Ort der Vitali. Eine Quelle der Ruhe und des Friedens!";
+  local WHO_ARE_YOU_TEXT = "Hey! Dieser Platz ist heilig! Was machst du da?!";
+  local STOP_IT_TEXT = "Hör sofort auf damit!";
+  local NOO_TEXT = "NEIN!!!";
+  local NEED_TO_BRING_IT_BACK_TEXT = "Dieser Unhold! Ich werde die Quelle des Lebens zurückbringen.";
+  local KEY = 403;
+  local KEY_LOCATION_TEXT = "Der Schlüssel für das Tor befindet sich im Westen unseres Landes. Ich muss einen Weg dorthin finden!";
+
+  -- Intro
+  ExAddCommandCameraAttach(true);
+  ExAddCommandMoving(MAIN_HERO_ID, 216, 16);
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, HOLY_SHRINE_TEXT, true);
+
+  -- White Lord arrives and walks to the shrine
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_TO);
+  ExAddCommandExecuteScriptFunction("ExOpenGate", GATE);
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 214, 17);
+  ExAddCommandMobOrientToObject(WHITE_LORD, HOLY_SHRINE);
+
+  -- Hero talks to him
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, WHITE_LORD);
+  ExAddCommandText(MAIN_HERO_ID, WHO_ARE_YOU_TEXT, true);
+
+  -- White Lords casts lightnings and "destroys" the shrine  
+  ExAddCommandCameraToObject(HOLY_SHRINE, false);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, STOP_IT_TEXT, true);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  AddCommandEffectLightning(HOLY_SHRINE);
+  ExAddCommandTakeObject(HOLY_SHRINE);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NOO_TEXT, true);
+
+  -- White Lord retreats
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 214, 11);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandMoving(MAIN_HERO_ID, 214, 16);
+  ExAddCommandMobOrient(MAIN_HERO_ID, 0, -1);
+  ExAddCommandMobOrient(WHITE_LORD, 0, 1);
+  ExAddCommandWait(250);
+  ExAddCommandExecuteScriptFunction("ExCloseGate", GATE);
+  ExAddCommandCameraToObject(TELEPORT_FROM, false);
+  ExAddCommandMoveAndUseObject(WHITE_LORD, TELEPORT_FROM);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandText(MAIN_HERO_ID, NEED_TO_BRING_IT_BACK_TEXT, true);
+  ExAddCommandCameraAttach(false);
+  local x, y = ExGetPos(KEY);
+  ExAddCommandStartObservation("key_observation", x, y, 4);
+  ExAddCommandCameraToObject(KEY, false);  
+  ExAddCommandText(MAIN_HERO_ID, KEY_LOCATION_TEXT, true);
+  ExAddCommandFinishObservation("key_observation");
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+
+  -- Clean up
+  ExAddCommandTakeObject(TELEPORT_TO);
+  ExAddCommandTakeObject(TELEPORT_FROM);
+end
+
+
+function WhiteLordFleeInnerRing(fast_forward)
+  fast_forward = fast_forward or false;
+
+  local state = GetState(WHITE_LORD);
+  assert(state == STATE_WL_SHRINE_STOLEN, "White Lord is in state " .. tostring(state));
+
+  local BRIDGE_ELEMENT = 4518;
+
+  if fast_forward then
+    ExAddCommandTakeObject(BRIDGE_ELEMENT);
+    ExAddCommandJumpToPos(WHITE_LORD, 113, 119);
+    ExAddCommandMobOrient(WHITE_LORD, 1, 0);
+    return;
+  end
+
+  local SUFFICIENT_FOR_NOW_TEXT = "Das sollte fürs Erste reichen..";
+  local STAY_AND_FIGHT_TEXT = "Wer bist du? Bleib stehen und kämpfe!"
+  local NEED_TO_FOLLOW_TEXT = "Ich muss den Eindringling weiter verfolgen, aber das Tor ist versperrt, und die Brücke zum Schlüssel ist kaputt..";
+  local USE_TUNNEL_TEXT = "Vielleicht gibt es noch einen anderen Weg zum Schlüssel. Der Tunnel hier sieht vielversprechend aus.";
+
+  local GATE_INNER_RING = 186;
+
+  -- Meeting and walking to the bridge
+  ExAddCommandCameraAttach(true);
+  ExAddCommandText(MAIN_HERO_ID, STAY_AND_FIGHT_TEXT, true);
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 163, 128);
+  ExAddCommandMobOrient(WHITE_LORD, 1, 0);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandMoving(MAIN_HERO_ID, 162, 132);
+  ExAddCommandMobOrientToObject(MAIN_HERO_ID, WHITE_LORD);
+
+  -- Destroy the bridge
+  ExAddCommandCameraToPos(166, 128);
+  ExAddCommandWait(750);
+  AddCommandEffectBridgeDestroy(BRIDGE_ELEMENT);
+  ExAddCommandTakeObject(BRIDGE_ELEMENT);
+
+  -- Move to the inner ring gate
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandMoving(WHITE_LORD, 154, 132);
+  ExAddCommandMobOrient(WHITE_LORD, -1, 0);
+
+  -- Open the inner ring gate, walk through it, and close it
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandMoving(MAIN_HERO_ID, 156, 132);
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandExecuteScriptFunction("ExOpenGate", GATE_INNER_RING);
+  ExAddCommandMoving(WHITE_LORD, 150, 132);
+  ExAddCommandMobOrientToObject(WHITE_LORD, MAIN_HERO_ID);
+  ExAddCommandExecuteScriptFunction("ExCloseGate", GATE_INNER_RING);
+  ExAddCommandWait(750);
+
+  -- White Lord retreats further
+  ExAddCommandCameraToObject(WHITE_LORD);
+  ExAddCommandText(WHITE_LORD, SUFFICIENT_FOR_NOW_TEXT, true);
+  ExAddCommandMoving(WHITE_LORD, 145, 114);
+  ExAddCommandJumpToPos(WHITE_LORD, 113, 119);
+  ExAddCommandMobOrient(WHITE_LORD, 1, 0);
+
+  -- Next mission steps
+  local INNER_GATE_KEY = 187;
+  local NEXT_STEPS_TUNNEL = 4482;
+  ExAddCommandCameraToObject(INNER_GATE_KEY, false);
+  ExAddCommandWait(250);
+  ExAddCommandText(MAIN_HERO_ID, NEED_TO_FOLLOW_TEXT, true);
+  ExAddCommandCameraToObject(NEXT_STEPS_TUNNEL, false);
+  ExAddCommandText(MAIN_HERO_ID, USE_TUNNEL_TEXT, true);
+  ExAddCommandCameraToObject(MAIN_HERO_ID, false);
+  ExAddCommandCameraAttach(false);
+
+  AddCommandSetState(WHITE_LORD, STATE_WL_FLED_INTO_INNER_RING);
+end
+
+function WhiteLordUnleashPaleness(fast_forward)
+  fast_forward = fast_forward or false;
+
+  local state = GetState(WHITE_LORD);
+  assert(state == STATE_WL_FLED_INTO_INNER_RING, "Wrong White Lord state: " .. tostring(state));
+
+  local PALENESS = 0;
+
+  if fast_forward then
+    ExAddCommandExecuteScriptFunction("ExSetClrlessLevel", PALENESS);
+    return;
+  end
+
+  local YOU_DARE_ENTER_TEXT = "Du wagst es also, mein Land zu betreten? Die Plage der Bleichen soll deine Kräfte zehren!";
+  local EXPLANATION_TEXT = "Das ist also die Plage der Bleichen, von der unsere Weisen neulich erzählt haben? Es fühlt sich an, als ob das Land selbst mir die Lebensenergie entzieht.. ich sollte nicht lange verweilen.";
+  local WARNING_TEXT = "Ich spüre starke Verwirbelungen in den Ätherströmen.. Es sollte mich nicht überraschen, wenn die Kreaturen hier plötzlich einige Zauber gelernt haben, die sie normalerweise nicht beherrschen.";
+
+  ExAddCommandMoving(MAIN_HERO_ID, 150, 131);
+
+  ExAddCommandCameraAttach(true);
+  local x, y = ExGetPos(WHITE_LORD);
+  ExAddCommandStartObservation("wl_observation", x, y, 2);
+  ExAddCommandCameraAttach(true);
+  ExAddCommandCameraToObject(WHITE_LORD);
+  ExAddCommandText(WHITE_LORD, YOU_DARE_ENTER_TEXT, true);
+
+  ExAddCommandExecuteScriptFunction("ExSetClrlessLevel", PALENESS);
+  StartOuterRippleEffect(x, y);
+  ExAddCommandWait(3000);
+  ExAddCommandFinishObservation("wl_observation");
+
+  ExAddCommandCameraToObject(MAIN_HERO_ID);
+  ExAddCommandText(MAIN_HERO_ID, EXPLANATION_TEXT, true);
+  ExAddCommandText(MAIN_HERO_ID, WARNING_TEXT, true);
+  ExAddCommandCameraAttach(false);
+
+  AddCommandSetState(WHITE_LORD, STATE_WL_PALENESS_UNLEASHED);
+end
+
+function WhiteLordSummonDiamanda(fast_forward)
+  fast_forward = fast_forward or false;
+
+  local state = GetState(WHITE_LORD);
+  assert(state == STATE_WL_PALENESS_UNLEASHED, "Wrong White Lord state: " .. tostring(state));
+
+  local DIAMANDA = 2426;
+
+  if fast_forward then
+    ExAddCommandJumpToPos(DIAMANDA, 120, 118);
+    ExAddCommandMobOrient(DIAMANDA, 1, 0);
+    return;
+  end
+
+  local YOU_MADE_IT_FAR_TEXT = "Du hast es bis hierher geschafft.. eine beachtliche Leistung. Aber letztendlich vergeblich.. du kannst mich nicht besiegen.";
+  local INTRODUCE_DIAMANDA_TEXT = "Die letzte, die es versucht hat, hat es tatsächlich geschafft, mich von dieser Welt zu vertreiben. Wenig später wurde sie von einer kombinierten Streitmacht der Syntheten und Kineten niedergestreckt. Was für eine Verschwendung.. Ich denke, ich kann sie besser einsetzen.";
+  local DIAMANDA_WHERE_AM_I_TEXT = "W-Wo bin ich? Bin ich nicht gestorben..?";
+  local DIAMANDA_COMMAND_TEXT = "Ich habe dich wieder zum Leben erweckt, damit du mich beschützen kannst. Los, Auf, vernichte den Eindringling! Ich befehle es dir.";
+  local DIAMANDA_ANSWER_TEXT = "Ja, Meister.";
+
+  local DIAMANDA_CATACOMB = 5554;
+  local x, y = ExGetPos(DIAMANDA_CATACOMB);
+  ExAddCommandStartObservation("diamanda_observation", x+2, y, 3);
+  ExAddCommandCameraAttach(true);
+  ExAddCommandCameraToObject(WHITE_LORD, false);
+  ExAddCommandText(WHITE_LORD, YOU_MADE_IT_FAR_TEXT, true);
+  ExAddCommandText(WHITE_LORD, INTRODUCE_DIAMANDA_TEXT, true);
+
+  ExAddCommandCameraToObject(DIAMANDA_CATACOMB, false);
+  ExAddCommandMobOrient(WHITE_LORD, -1, 0);
+  AddCommandEffectLightningXY(x + 1, y);
+  AddCommandEffectLightningXY(x + 1, y + 1);
+  AddCommandEffectLightningXY(x + 2, y);
+  AddCommandEffectLightningXY(x + 2, y + 1);
+  ExAddCommandJumpToPos(DIAMANDA, 112, 119);
+
+  ExAddCommandWait(500);
+  ExAddCommandCameraToObject(DIAMANDA);
+  ExAddCommandText(DIAMANDA, DIAMANDA_WHERE_AM_I_TEXT, true);
+  ExAddCommandText(WHITE_LORD, DIAMANDA_COMMAND_TEXT, true);
+  ExAddCommandText(DIAMANDA, DIAMANDA_ANSWER_TEXT, true);
+  ExAddCommandMoving(DIAMANDA, 120, 118);
+  ExAddCommandMobOrient(DIAMANDA, 1, 0);
+  ExAddCommandMobOrient(WHITE_LORD, 1, 0);
+  ExAddCommandFinishObservation("diamanda_observation");
+
+  ExAddCommandCameraToObject(MAIN_HERO_ID);
+  ExAddCommandCameraAttach(false);
+
+  AddCommandSetState(WHITE_LORD, STATE_WL_DIAMANDA_SUMMONED);
+end
+
+function WhiteLordFleeOuterRealm(fast_forward)
+  fast_forward = fast_forward or false;
+
+  local state = GetState(WHITE_LORD);
+  assert(state == STATE_WL_DEFEATED, "White Lord state is: " .. tostring(state));
+
+  local x = 112;
+  local y = 119;
+
+  if fast_forward then
+    ExAddCommandPlaceObject(WHITE_LORD_PORTAL, x, y);
+    ExAddCommandExecuteScriptFunction("ExSetUsability", WHITE_LORD_PORTAL, true);
+    -- Move the White Lord out of sight. We could use ExKillHero, but that would trigger a state transition, and we do not want that.
+    ExAddCommandJumpToPos(WHITE_LORD, 190, 91);
+    return;
+  end
+
+  local IMPRESSIVE_RETREAT_TEXT = "Beeindruckend. Wie Diamanda schon feststellen durfte, bin ich in dieser Welt nicht sterblich. Dennoch du bist stark genug, um meine Projektionen zu zerstören und meine Pläne zu behindern. Nun denn, ich werde mich fürs Erste in die Äußere Ebene zurückziehen, bis die Bleiche Plage dich dahinrafft..";
+  local USE_TELEPORTER_TEXT = "In dieser Welt mag der Weiße Lord unsterblich sein, aber in der Äußeren Ebene ist er es nicht. Ich muss den Teleporter nutzen und den Weißen Lord ein für alle Mal besiegen, bevor mich die Plage der Bleichen dahinrafft!";
+
+  ExAddCommandText(WHITE_LORD_STRONG, IMPRESSIVE_RETREAT_TEXT, true);
+
+  AddCommandEffectLightningXY(x, y);
+  AddCommandEffectLightningXY(x + 1, y + 1);
+  AddCommandEffectLightningXY(x + 1, y);
+  AddCommandEffectLightningXY(x + 1, y - 1);
+  AddCommandEffectLightningXY(x, y);
+
+  ExAddCommandPlaceObject(WHITE_LORD_PORTAL, x, y);
+  ExAddCommandExecuteScriptFunction("ExSetUsability", WHITE_LORD_PORTAL, true);
+  ExAddCommandText(MAIN_HERO_ID, USE_TELEPORTER_TEXT, true);
+
+  AddCommandSetState(WHITE_LORD, STATE_WL_FLED_INTO_OUTER_REALM);
+end
+
+
+function WhiteLordOutro()
+  local state = GetState(WHITE_LORD);
+  assert(state == STATE_WL_KILLED, "White Lord is in state " .. tostring(state));
+
+  if MAIN_HERO_RACE == DEBUG then
+    ExAddCommandWin();
+    return;
+  end
+
+  local DID_HE_DIE_TEXT = "War es das? Ist der Weiße Lord.. wirklich tot?";
+  local ITS_OVER_TEXT = "Tatsächlich! Es ist vorbei! Sogar die Plage der Bleichen ist verschwunden.";
+  local HOLY_SHRINE_TEXT = "Da ist ja auch unser heiliger Schrein!";
+  local HOLY_SHRINES_TEXT = "Die heiligen Schreine der anderen Rassen hat er ja auch gestohlen! Was er wohl damit wollte?";
+
+  ExAddCommandText(MAIN_HERO_ID, DID_HE_DIE_TEXT, true);
+  ExAddCommandWait(1500);
+  
+  local x, y = ExGetPos(WHITE_LORD_PORTAL);
+  AddCommandEffectLightningXY(x, y);
+  AddCommandEffectLightningXY(x + 1, y + 1);
+  AddCommandEffectLightningXY(x + 1, y);
+  AddCommandEffectLightningXY(x + 1, y - 1);
+  AddCommandEffectLightningXY(x0, y);
+  ExAddCommandTakeObject(WHITE_LORD_PORTAL);
+
+  ExAddCommandWait(1000);
+  FinishOuterRippleEffect();
+  ExAddCommandWait(250);
+  local NO_PALENESS = 1;
+  ExAddCommandExecuteScriptFunction("ExSetClrlessLevel", NO_PALENESS);
+
+  ExAddCommandWait(500);
+  ExAddCommandText(MAIN_HERO_ID, ITS_OVER_TEXT, true);
+  
+  local SHRINES = { 5553, 5552, 5551, 5550, 0, 5553 }; -- hack to avoid crashing when using the debug hero
+  local OWN_SHRINE = SHRINES[MAIN_HERO_RACE];  
+  ExAddCommandCameraAttach(true);
+
+  ExAddCommandPlaceObject(SHRINES[CHAOS], 115, 121);
+  ExAddCommandPlaceObject(SHRINES[KINET], 110, 122);
+  ExAddCommandPlaceObject(SHRINES[SYNTHET], 110, 116);
+  ExAddCommandPlaceObject(SHRINES[VITALI], 116, 115);
+
+  ExAddCommandCameraToObject(OWN_SHRINE);
+  ExAddCommandText(MAIN_HERO_ID, HOLY_SHRINE_TEXT, true);
+  ExAddCommandText(MAIN_HERO_ID, HOLY_SHRINES_TEXT, true);
+  for race = CHAOS, VITALI do
+    if MAIN_HERO_RACE ~= race then
+      ExAddCommandCameraToObject(SHRINES[race]);
+      ExAddCommandWait(1500);
+    end
+  end
+  ExAddCommandCameraToObject(MAIN_HERO_ID);
+
+  if MAIN_HERO_RACE == CHAOS then
+    WhiteLordOutroChaos();
+  elseif MAIN_HERO_RACE == KINET then
+    WhiteLordOutroKinet();
+  elseif MAIN_HERO_RACE == SYNTHET then
+    WhiteLordOutroSynthet();
+  elseif MAIN_HERO_RACE == VITALI then
+    WhiteLordOutroVitali();
+  elseif MAIN_HERO_RACE == DEBUG then
+    ExAddCommandText(WHITE_LORD, "Your shrine was stolen", true);
+  else
+    error("Unknown MAIN_HERO_RACE: " .. tostring(MAIN_HERO_RACE));
+  end
+
+  ExAddCommandCameraAttach(false);
+
+  ExAddCommandWin();
+end
+
+function WhiteLordOutroChaos()
+    local BRING_SHRINE_BACK_TEXT = "Wie dem auch sei, nun kann ich den Altar des Chaos zurückbringen";
+    local FINAL_WORDS_TEXT = "Die Flammen des Chaos lodern wieder. Was für ein herrlicher Anblick!";
+
+    local SHRINE = 5553;
+    ExAddCommandText(MAIN_HERO_ID, BRING_SHRINE_BACK_TEXT, true);
+    ExAddCommandMoving(MAIN_HERO_ID, 115, 120);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+
+    ExAddCommandPlaceObject(SHRINE, 216, 205);
+    ExAddCommandJumpToPos(MAIN_HERO_ID, 218, 209);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    ExAddCommandCameraToObject(MAIN_HERO_ID);
+    ExAddCommandText(MAIN_HERO_ID, FINAL_WORDS_TEXT, true);
+end
+
+function WhiteLordOutroKinet()
+    local BRING_SHRINE_BACK_TEXT = "Wie dem auch sei, nun kann ich den Schrein der Ordnung zurückbringen";
+    local FINAL_WORDS_TEXT = "Nun ist die Harmonie der Spähren wiederhergestellt, und ich kann mich meinen Kalligraphie-Übungen widmen.";
+
+    local SHRINE = 5552;
+    ExAddCommandText(MAIN_HERO_ID, BRING_SHRINE_BACK_TEXT, true);
+    ExAddCommandMoving(MAIN_HERO_ID, 111, 121);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+
+    ExAddCommandPlaceObject(SHRINE, 23, 222);
+    ExAddCommandJumpToPos(MAIN_HERO_ID, 23, 224);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    ExAddCommandCameraToObject(MAIN_HERO_ID);
+    ExAddCommandText(MAIN_HERO_ID, FINAL_WORDS_TEXT, true);
+end
+
+function WhiteLordOutroSynthet()
+    local BRING_SHRINE_BACK_TEXT = "Wie dem auch sei, nun kann ich den Schrein der Synthese zurückbringen.";
+    local FINAL_WORDS_TEXT = "Nun kann ich mir in aller Ruhe ein paar neue Kondensatoren gönnen.";
+
+    local SHRINE = 5551;
+    ExAddCommandText(MAIN_HERO_ID, BRING_SHRINE_BACK_TEXT, true);
+    ExAddCommandMoving(MAIN_HERO_ID, 111, 117);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+
+    ExAddCommandPlaceObject(SHRINE, 19, 18);
+    ExAddCommandJumpToPos(MAIN_HERO_ID, 19, 16);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    ExAddCommandCameraToObject(MAIN_HERO_ID);
+    ExAddCommandText(MAIN_HERO_ID, FINAL_WORDS_TEXT, true);
+end
+
+function WhiteLordOutroVitali()
+    local BRING_SHRINE_BACK_TEXT = "Wie dem auch sei, nun kann ich die Quelle des Lebens zurückbringen.";
+    local FINAL_WORDS_TEXT = "Die Quelle des Lebens ist wieder an ihrem angestammten Platz. Möge sie das Land der Vitali mit Leben erfüllen!";
+
+    local SHRINE = 5550;
+    ExAddCommandText(MAIN_HERO_ID, BRING_SHRINE_BACK_TEXT, true);
+    ExAddCommandMoving(MAIN_HERO_ID, 115, 117);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+    AddCommandEffectLightning(SHRINE);
+
+    ExAddCommandPlaceObject(SHRINE, 214, 18);
+    ExAddCommandJumpToPos(MAIN_HERO_ID, 217, 18);
+    ExAddCommandMobOrientToObject(MAIN_HERO_ID, SHRINE);
+    ExAddCommandCameraToObject(MAIN_HERO_ID);
+    ExAddCommandText(MAIN_HERO_ID, FINAL_WORDS_TEXT, true);
+end
+
+function WhiteLordIsAttackable()
+  return GetState(WHITE_LORD) == STATE_WL_DIAMANDA_SUMMONED;
+end
+
+-- ##############################################################################
+-- #                              STATE SCRIPTING                               #
+-- ##############################################################################
+
+-- dictionary, mapping object_id -> state
+STATE = {}
+
+function SetState(object_id, state)
+  STATE[object_id] = state;
+end
+
+function AddCommandSetState(monster_id, state)
+  ExAddCommandExecuteScriptFunction("SetState", monster_id, state);
+end
+
+function GetState(object_id)
+  local state = STATE[object_id];
+  if state == nil then
+    state = 0; -- default value
+  end
+  return state;
+end
+
+-- ##############################################################################
+-- #                             UTILITY FUNCTIONS                              #
+-- ##############################################################################
+
+function AddCommandRemoteFight(monster_id)
+  ExAddCommandExecuteScriptFunction("ExRemoteUseObjectCmd", MAIN_HERO_ID, monster_id);
+end
+
+function UseWhiteLordDeck(white_lord_deck)
+  local deck = WHITE_LORD_DECKS[white_lord_deck];
+  assert(getn(deck) == 16, "An active Deck should have exactly 16 spells, not " .. getn(deck));
+  ExClearHand(WHITE_LORD_STRONG);
+  for i = 1, 16 do
+    ExAddSpellToHand(WHITE_LORD_STRONG, deck[i]);
+  end
+end
+
+function DecideOnLootSystem()
+  local QUESTION_TEXT = "Es gibt zwei Varianten, Zauberspruch-Belohnungen zu verteilen. Die klassische Variante verteilt zufällige Sprüche. Die Auswahl-Variante verteilt auch zufällige Sprüche, aber es gibt die Möglichkeit, nach der ersten Spruchauswahl zu entscheiden, ob man die ausgelosten Sprüche behält, oder blind andere erhält. Welche Variante soll genutzt werden? Drücke ja für die klassische Variante, nein für die Auswahl-Variante.";
+  
+  local set_state_lambda = 
+    function(object_id, state)
+      return
+        function()
+          SetState(%object_id, %state);
+        end;
+    end;
+
+  local on_yes = set_state_lambda(LOOT_SYSTEM, STATE_LOOT_SYSTEM_CLASSIC);
+  local on_no = set_state_lambda(LOOT_SYSTEM, STATE_LOOT_SYSTEM_CHOICE);
+
+  AddCommandAskQuestion(SYSTEM, QUESTION_TEXT, on_yes, on_no, false);
+end
+
+-- ##############################################################################
+-- #                                LOCAL HOOKS                                 #
+-- ##############################################################################
+
+
+function Local_Hook_Init()
+  --to make random work (almost) as expected
+  randomseed(ExGetTickCount() * 1000);
+end
+
+function Local_Hook_GameStarted()
+  -- Trigger caches store function callbacks (i.e. memory addresses),
+  -- which become invalid (and thus nil) when the game is loaded.
+  -- Solution: reset the trigger caches every time the game is loaded
+  PROXIMITY_TRIGGERS = {};
+  KILL_TRIGGERS = {};
+  USE_TRIGGERS = {};
+
+  if not GAME_LOADED then
+
+    -- make monsters in the inner ring resistant to colorlessness
+    for i = 1, getn(COLORLESSNESS_TOLERANT_MONSTERS) do
+      ExSetHeroColorlessnessTolerance(COLORLESSNESS_TOLERANT_MONSTERS[i], true);
+    end
+
+    InitializeArtefacts();
+
+    -- configure the map for the main hero's race
+    SetMainHeroRace();
+    ConfigureMapForMainHeroRace();
+    local NO_PALENESS = 1;
+    ExSetClrlessLevel(NO_PALENESS);
+
+    if MAIN_HERO_ID == MAIN_HERO_DEBUG then
+      InitializeDebug();
+    elseif ExIsAlive(MAIN_HERO_DEBUG) then
+      ExKillHero(MAIN_HERO_DEBUG);
+    end
+
+    -- initialize loot system, if not done yet
+    assert(LOOT_LIST == nil, "game was not loaded, but LOOT_LIST already exists.");
+
+    LOOT_LIST = { {}, {}, {}, {} };
+    InitOwnLootTable();
+
+    FOREIGN_LOOT_LIST = { {}, {}, {}, {}, {} };
+    InitForeignLootTable();
+
+    SetUpLottery();
+    ValidateLootLists();
+    
+    SPELLS_AWARDED = {};
+    DecideOnLootSystem();
+
+    GAME_LOADED = true;
+  end
+
+  RegisterProximityTriggers();
+  RegisterKillTriggers();
+  RegisterUseTriggers();
+
+  -- Start music
+  bg_theme_list = {"ad_Red01", "ad_Blue01", "ad_Black01", "ad_Green01" };
+  if MAIN_HERO_RACE ~= DEBUG then
+    ExStartBackgroundTheme(bg_theme_list[MAIN_HERO_RACE]);
+  end
+
+  --FastForwardWhiteLordStateTo(STATE_WL_FLED_INTO_OUTER_REALM);
+end;
+
+function Local_Hook_OnCloseMessageBox(choice)
+  local state = GetState(QUESTION_STATE);
+  if state == STATE_ASKING_QUESTION then
+    if choice == "OK" then
+      local yes_callback = QUESTION_CALLBACKS[1];
+      if yes_callback ~= nil then
+        yes_callback();
+      end
+    elseif choice == "Cancel" then
+      local no_callback = QUESTION_CALLBACKS[2];
+      if no_callback ~= nil then
+        no_callback();
+      end
+    else
+      error("Unhandled response: " .. tostring(choice));
+    end
+  else
+    assert(state == STATE_NOT_ASKING_QUESTION, "Unknown asking question state: " .. tostring(state));
+  end
+end
+
+-- Important note: do not use "true" and "false" as truth values here. It seems that the callback goes through C, which converts all falses to nils and triggers the asserts.
+-- We could use true and nil instead of true and false, but then we would not recognize when a function actually returns nil (which is not intended for the on use-callbacks)
+USABLE = "Usable";
+NOT_USABLE = "Not usable";
+function Local_Hook_OnPreUse(object_id, hero_id)
+  for i = 1, getn(USE_TRIGGERS) do
+    local use_trigger = USE_TRIGGERS[i];
+    local trigger_object_id = use_trigger[1];
+    local trigger_hero_id = use_trigger[2];
+    if object_id == trigger_object_id and hero_id == trigger_hero_id then      
+      local callback = use_trigger[3];
+      assert(callback ~= nil, "(trigger monster id: " .. tostring(monster_id) .. ") Callback is nil! Did you load a game and forgot to refresh the function pointer?");
+
+      local result = callback();
+      assert(result ~= nil, "callback should return true or false, not nil");
+
+      if result == USABLE then
+        return true;
+      elseif result == NOT_USABLE then
+        ExSetUsability(object_id, false);
+        ExAddCommandExecuteScriptFunction("ExSetUsability", object_id, true);
+        return nil;
+      else
+        error("Unknown usability state: " .. tostring(result));
+      end
+    end
+  end
+  
+  return true;
+end
+
+function Local_Hook_OnStep()
+  -- When executing commands, do not fire triggers
+  if ExGetCommandQueueSize() > 0 then
+    return;
+  end
+
+  -- Activate proximity triggers if necessary
+  for i = 1, getn(PROXIMITY_TRIGGERS) do
+    local monster_id = PROXIMITY_TRIGGERS[i][1];
+    local trigger_range = PROXIMITY_TRIGGERS[i][2];
+
+    local distance = CalcDistanceObjects(MAIN_HERO_ID, monster_id);
+    if distance <= trigger_range then
+      local callback = PROXIMITY_TRIGGERS[i][3];
+      -- When loading a saved game, it can happen that the callback is nil.
+      -- Maybe that is because the local Init() hook is not executed before onstep is, I dont know.
+      -- Consequence: we cannot use assert, as it may fail without being a critical failure. Instead early exit.
+      --assert(callback ~= nil, "(trigger monster id: " .. tostring(monster_id) .. ") Callback is nil! Did you load a game and forgot to refresh the function pointer?");
+      if callback == nil then
+        return;
+      end
+
+      callback();
+    end
+  end
+
+  for i = 1, 6000 do
+    if i ~= MAIN_HERO_ID and i ~= TRADER_CHAOS and false then
+      local type = ExGetObjectType(i);
+      if type == "monster" then
+        local distance = CalcDistanceObjects(MAIN_HERO_ID, i);
+        if distance <= 1 then
+          ExAddCommandMoveAndUseObject(MAIN_HERO_ID, i);
+        end
+      end
+    end
+  end
+end
+
+function Local_Hook_OnHeroKill(hero_id)
+  -- Do not grant loot for killing yourself, the debug hero (autokilled), or the White Lord(s)
+  local grant_loot = hero_id ~= MAIN_HERO_ID and hero_id ~= WHITE_LORD and hero_id ~= WHITE_LORD_STRONG and hero_id ~= MAIN_HERO_DEBUG;
+  if grant_loot then
+    -- gives loot to hero after enemy is killed
+    GenerateLoot(hero_id);
+    ExCreateCorpse(hero_id);
+  end;
+
+  -- if necessary, trigger on kill effect
+  for i = 1, getn(KILL_TRIGGERS) do
+    local monster_id = KILL_TRIGGERS[i][1];
+
+    if monster_id == hero_id then
+      local callback = KILL_TRIGGERS[i][2];
+      assert(callback ~= nil, "(trigger monster id: " .. tostring(monster_id) .. ") Callback is nil! Did you load a game and forgot to refresh the function pointer?");
+      callback();  
+    end
+  end
+
+  return true;
+end;
+
+-- ##############################################################################
+-- #                             MAP CONFIGURATION                              #
+-- ##############################################################################
+
+-- Sets the race of the main hero
+function SetMainHeroRace()
+  MAIN_HERO_ID = ExGetMainHeroID();
+ 
+  if MAIN_HERO_ID == MAIN_HERO_CHAOS then
+    MAIN_HERO_RACE = CHAOS;
+  end;
+
+  if MAIN_HERO_ID == MAIN_HERO_KINET then
+    MAIN_HERO_RACE = KINET;
+  end;
+
+  if MAIN_HERO_ID == MAIN_HERO_SYNTHET then
+    MAIN_HERO_RACE = SYNTHET;
+  end;
+
+  if MAIN_HERO_ID == MAIN_HERO_VITALI then
+    MAIN_HERO_RACE = VITALI;
+  end;
+
+  if MAIN_HERO_ID == MAIN_HERO_DEBUG then
+    MAIN_HERO_RACE = DEBUG;
+  end;
+
+  assert(MAIN_HERO_RACE ~= UNITIALIZED, "unknown main hero id: " .. tostring(MAIN_HERO_ID));
+end;
+
+-- Configure the map for MAIN_HERO_RACE. This includes some shops, specializations, power nodes, and beacons. Loot rewards are not configured here.
+function ConfigureMapForMainHeroRace()
+  assert(MAIN_HERO_RACE ~= UNITIALIZED, "MAIN_HERO_RACE is not set");
+
+  -- "configure" simply means remove superfluous objects, as all race specific objects are already on the map
+  for race_index = CHAOS, DEBUG do
+    if race_index ~= MAIN_HERO_RACE then
+      local objects_to_remove = RACE_SPECIFIC_OBJECTS[race_index];
+      for i = 1, getn(objects_to_remove) do
+        ExTakeObject(objects_to_remove[i]);
+      end;
+    end;
+  end;
+end;
+
+-- ##############################################################################
+-- #                              LOOT GENERATION                               #
+-- ##############################################################################
+
+STATE_LOOT_SYSTEM_CLASSIC = 0;
+STATE_LOOT_SYSTEM_CHOICE = 1;
+
+-- Gives loot to the hero, based on the strength of the killed monster
+function GenerateLoot(killed_monster_id)
+  local mob_level = ExGetHeroLevel(killed_monster_id);
+  local loot_count = GetLootCount(mob_level);
+  local loot_level = GetOwnLootLevel(mob_level);
+
+  ExStartLootMessage();
+
+  local own_loot = {};
+  for j = 1, loot_count do
+    local loot = GetSpell(LOOT_LIST[loot_level]);
+    if loot ~= false then
+      local n = getn(own_loot);
+      own_loot[n+1] = loot;
+      ExAddLootMessageSpell(loot);
+    end;
+  end;
+
+  local race, foreign_loot = GenerateForeignLoot(mob_level);
+  for i = 1, getn(foreign_loot) do
+    ExAddLootMessageSpell(foreign_loot[i])
+  end
+  
+  if getn(own_loot) + getn(foreign_loot) > 0 then
+    ExSendLootMessage();
+    local QUESTION_TEXT = "Wenn ich diese Sprüche ablehne besteht das Risiko, dass es weniger Zaubersprüche werden. Möchte ich diese Sprüche behalten?";
+    local grant_spells =
+      function()
+        for i = 1, getn(%own_loot) do
+          ExAddSpell(MAIN_HERO_ID, %own_loot[i]);
+        end
+        for i = 1, getn(%foreign_loot) do
+          ExAddSpell(MAIN_HERO_ID, %foreign_loot[i]);
+        end
+      end;
+
+    local get_alternative_spells =
+      function()
+        -- step 1: put the - now unused - spells back in the drop pool
+        for i = 1, getn(%own_loot) do
+          local found = false;
+          local spell_codes = "";
+          for j = 1, getn(LOOT_LIST[%loot_level]) do
+            local entry = LOOT_LIST[%loot_level][j];
+            local spell_code = entry[1];
+            spell_codes = spell_codes .. spell_code .. " ";
+            if spell_code == %own_loot[i] then
+              assert(not found, "Spell has multiple entries: " .. tostring(spell_code) .. " at loot level " .. tostring(%loot_level));
+              LOOT_LIST[%loot_level][j][2] = LOOT_LIST[%loot_level][j][2] + 1;
+              found = true;
+            end           
+          end
+          assert(found, "Spell not found: " .. tostring(%own_loot[i]) .. ", given spells are " .. spell_codes);
+          SPELLS_AWARDED[%own_loot[i]] = SPELLS_AWARDED[%own_loot[i]] - 1;
+          assert(SPELLS_AWARDED[%own_loot[i]] >= 0, "Negative amount: " .. tostring(SPELLS_AWARDED[%own_loot[i]]));
+        end
+        for i = 1, getn(%foreign_loot) do
+          local found = false;
+          for j = 1, getn(FOREIGN_LOOT_LIST[%race]) do
+            local entry = FOREIGN_LOOT_LIST[%race][j];
+            local spell_code = entry[1];
+            if spell_code == %foreign_loot[i] then
+              assert(not found, "Spell has multiple entries: " .. tostring(spell_code) .. " at race " .. tostring(%race));
+              FOREIGN_LOOT_LIST[%race][j][2] = FOREIGN_LOOT_LIST[%race][j][2] + 1;
+              found = true;
+            end
+          end
+          assert(found, "Spell not found: " .. tostring(%foreign_loot[i]));
+          SPELLS_AWARDED[%foreign_loot[i]] = SPELLS_AWARDED[%foreign_loot[i]] - 1;
+          assert(SPELLS_AWARDED[%foreign_loot[i]] >= 0, "Negative amount: " .. tostring(SPELLS_AWARDED[%foreign_loot[i]]));
+        end
+
+        -- Step 2: add new loot
+	ExStartLootMessage();
+        local spells_granted = 0;
+        for j = 1, getn(%own_loot) do
+          local DECLINE_PENALTY = 5; -- 5% chance to loose a own race spell
+          if random(1, 100) > DECLINE_PENALTY then
+            local loot = GetSpell(LOOT_LIST[%loot_level]);
+            if loot ~= false then
+              AddSpell(MAIN_HERO_ID, loot);
+              spells_granted = spells_granted + 1;
+            end
+          end
+        end
+
+        for j = 1, getn(%foreign_loot) do
+          local DECLINE_PENALTY = 10; -- 10% chance to loose a foreign spell
+          if random(1, 100) > DECLINE_PENALTY then
+            local loot = GetSpell(FOREIGN_LOOT_LIST[%race]);
+            AddSpell(MAIN_HERO_ID, loot);
+            spells_granted = spells_granted + 1;
+          end
+        end
+
+        if spells_granted > 0 then
+          ExSendLootMessage();
+        else
+          ExSendNoLootMessage();
+        end
+      end;
+  
+    local state = GetState(LOOT_SYSTEM);
+    if state == STATE_LOOT_SYSTEM_CLASSIC then
+      grant_spells();
+    elseif state == STATE_LOOT_SYSTEM_CHOICE then
+      AddCommandAskQuestion(MAIN_HERO_ID, QUESTION_TEXT, grant_spells, get_alternative_spells, false);
+    else
+      error("Unknown loot system state: " .. tostring(state));
+    end
+  else
+    ExSendNoLootMessage();
+  end;
+end;
+
+-- Gives loot to the hero, based on the strength of the killed monster
+function GenerateLootV2(killed_monster_id)
+  local mob_level = ExGetHeroLevel(killed_monster_id);
+  local loot_count = GetLootCount(mob_level);
+  local loot_level = GetOwnLootLevel(mob_level);
+
+  num_spells_awarded = 0;
+ 
+  for j = 1, loot_count do
+    local loot = GetSpell(LOOT_LIST[loot_level]);
+    if loot ~= false then
+      AddSpell(MAIN_HERO_ID, loot);
+    end;
+  end;
+  GenerateForeignLoot(mob_level);
+
+  if num_spells_awarded > 0 then
+    ExSendLootMessage();
+  else
+    ExSendNoLootMessage();
+  end;
+end;
+
+-- Generate loot from other races
+function GenerateForeignLoot(mob_level)
+  local spells = {};
+  local drop_chance = FOREIGN_LOOT_PERCENT_CHANCE;
+
+  local location = GetLocationFromLevel(mob_level)
+  if location == HOME then
+    return HOME, spells;
+  elseif location == COLORLESS then
+    drop_chance = FOREIGN_LOOT_INNER_RING_PERCENT_CHANCE;
+  end;
+
+  if random(1, 100) <= drop_chance then
+    foreign_spells = FOREIGN_LOOT_LIST[location];
+    local foreign_spell = GetSpell(foreign_spells);
+    if foreign_spell ~= false then
+      local n = getn(spells);
+      spells[n+1] = foreign_spell;
+    end;
+  end;
+
+  return location, spells;
+end;
+
+
+function GenerateForeignLootV2(mob_level)
+  local drop_chance = FOREIGN_LOOT_PERCENT_CHANCE;
+
+  local location = GetLocationFromLevel(mob_level)
+  if location == HOME then
+    return;
+  elseif location == COLORLESS then
+    drop_chance = FOREIGN_LOOT_INNER_RING_PERCENT_CHANCE;
+  end;
+
+  if random(1, 100) <= drop_chance then
+    foreign_spells = FOREIGN_LOOT_LIST[location];
+    local foreign_spell = GetSpell(foreign_spells);
+    if foreign_spell ~= false then
+      AddSpell(MAIN_HERO_ID, foreign_spell);
+    end;
+  end;
+end;
+
+-- Gets the level of an item
+function GetOwnLootLevel(mob_level) --the level of the mob that drops the item
+
+  if mob_level <= 3 then
+    return 1;
+  end;
+  if mob_level <= 5 then
+    return 2;
+  end; 
+  if mob_level <= 9 then
+    return 3;
+  end;
+  if mob_level >= 10 then
+    return 4;
+  end;
+
+  error("Unhandled monster level: " .. tostring(mob_level))
+end;
+
+-- Gets the location of the main hero, based on a monster level. "Location" means one of the four race (or colorless) areas, not (x, y) values
+function GetLocationFromLevel(mob_level)
+  if mob_level <= 5 then
+    return HOME;
+  end;
+
+  if mob_level <= 7 then
+    return CHAOS;
+  end;
+
+  if mob_level <= 9 then
+    return KINET;
+  end;
+
+  if mob_level <= 11 then
+    return SYNTHET;
+  end;
+
+  if mob_level <= 12 then
+    return VITALI;
+  end;
+
+  if mob_level >= 13 then
+    return  COLORLESS;
+  end;
+
+  error("Unhandled monster level: " .. tostring(mob_level));
+end;
+
+-- Gets loot count
+function GetLootCount(mob_level)
+
+  if mob_level <= 3 then
+    return 2;
+  end;
+
+  return random(1, 2);
+end;
+
+-- Selects a spell from the given list. Spells with higher frequencies are more likely. Chosen spell is taken out of the list afterwards.
+function GetSpell(list)  
+  local num_available_spells = 0;
+  for i = 1, getn(list) do
+    local frequency = list[i][2];
+    num_available_spells = num_available_spells + frequency;
+  end;
+
+  if num_available_spells == 0 then
+    return false;
+  end;
+
+  local desired_index = random(1, num_available_spells);
+
+  local spells_processed = 0;
+  for i = 1, getn(list) do
+    local spell_code = list[i][1];
+    local frequency = list[i][2];
+    spells_processed = spells_processed + frequency;
+
+    if spells_processed >= desired_index then
+      if SPELLS_AWARDED[spell_code] == nil then
+        SPELLS_AWARDED[spell_code] = 0;
+      end;
+
+      -- Make sure spell was not awarded too often already. This can happen when a spell appears in different loot and the sum of its frequencies is > MAX_SPELL_DROP_COUNT
+      if SPELLS_AWARDED[spell_code] < MAX_SPELL_DROP_COUNT then
+        list[i][2] = list[i][2] - 1;
+        SPELLS_AWARDED[spell_code] = SPELLS_AWARDED[spell_code] + 1;
+        return spell_code;
+      else
+        -- Spell was awarded too often already. Remove it from the drop pool and try again
+        list[i][2] = 0;
+        return GetSpell(list);
+      end;
+    end;
+  end;
+
+  error("Failed to get a spell: desired_index was " .. tostring(desired_index) .. ", and " .. tostring(available_spells) .. " spells are available.");
+end;
+
+
+-- ##############################################################################
+-- #                         LOOT DROPS CONFIGURATION                           #
+-- ##############################################################################
+
+
+-- Helper function to add a spell paired with its frequency to a loot pool list
+function AddSpellToList(list, spellCode, frequency)
+  local n = getn(list)
+  list[n+1] = {spellCode, frequency};
+end;
+
+-- Add a spell with a given frequency as own-race drop for the given loot-level
+function AddOwnLoot(loot_level, spell_code, frequency)
+  AddSpellToList(LOOT_LIST[loot_level], spell_code, frequency);
+end;
+
+-- Add a spell from a foreign race to the pool of possible drops
+function AddForeignLoot(race, spell_code, frequency)
+  assert(FOREIGN_LOOT_LIST[race] ~= nil, "no loot list for race = " .. tostring(race));
+  
+  AddSpellToList(FOREIGN_LOOT_LIST[race], spell_code, frequency);
+end;
+
+-- Depending on MAIN_HERO_RACE, initialize the list of possible own-race drops
+function InitOwnLootTable()
+  assert(MAIN_HERO_RACE ~= UNITIALIZED, "MAIN_HERO_RACE not set");
+
+  if MAIN_HERO_RACE == CHAOS then
+    InitChaosLootTable();
+  elseif MAIN_HERO_RACE == CHAOS then
+    InitChaosLootTable();
+  elseif MAIN_HERO_RACE == KINET then
+    InitKinetLootTable();
+  elseif MAIN_HERO_RACE == SYNTHET then
+    InitSynthetLootTable();
+  elseif MAIN_HERO_RACE == VITALI then
+    InitVitaliLootTable();
+  elseif MAIN_HERO_RACE == DEBUG then
+    -- do nothing
+  else
+    error("Unknown MAIN_HERO_RACE: " .. tostring(MAIN_HERO_RACE));
+  end;
+end;
+
+-- Possible spell drops when playing as chaos
+function InitChaosLootTable()
+ -- lvl 1 spells
+  local ll = 1;
+  AddOwnLoot(ll, "WLBRAAAA", 1); -- Wall of Burning Rock (1/3)
+  AddOwnLoot(ll, "FLIC", 1); -- Flame Lick
+  AddOwnLoot(ll, "PLMR", 2); -- Polymorph
+  AddOwnLoot(ll, "KBGD", 2); -- Kobold Guard (1/3)
+  AddOwnLoot(ll, "KBSH", 2); -- Kobold Shaman (0/1)
+  AddOwnLoot(ll, "KBEL", 2); -- Kobold Elder (2/2)
+  AddOwnLoot(ll, "KBWR", 2); -- Kobold Warrior (1/1, +1 offense)
+  AddOwnLoot(ll, "ORSH", 1); -- Orc Shaman (1/2)
+  AddOwnLoot(ll, "LGST", 2); -- Lightning Storm
+  AddOwnLoot(ll, "GEYS", 2); -- Geysir
+  AddOwnLoot(ll, "CLIG", 2); -- Call Lightning
+  AddOwnLoot(ll, "WHAS", 1); -- Whirling Ashes
+  AddOwnLoot(ll, "SLWL", 2); -- Silicon Wall (0/6, +1 defense)
+  AddOwnLoot(ll, "NWLF", 2); -- Night Wolf (1/1)
+  AddOwnLoot(ll, "PRAT", 1); -- Plague Rat (3/4)
+
+ -- lvl 2 spells
+  ll = 2;
+  AddOwnLoot(ll, "BATT", 2); -- Bat (3/2)
+  AddOwnLoot(ll, "CNBL", 1); -- Cannibalism
+  AddOwnLoot(ll, "PRAT", 2); -- Plague Rat (3/4)
+  AddOwnLoot(ll, "STRG", 1); -- Strength
+  AddOwnLoot(ll, "FLIC", 1); -- Flame Lick
+  AddOwnLoot(ll, "ASST", 2); -- Ash Storm
+  AddOwnLoot(ll, "ORGD", 1); -- Orc Guard (2/5)
+  AddOwnLoot(ll, "BRGR", 1); -- Burning Graves
+  AddOwnLoot(ll, "SLWL", 2); -- Silicon Wall (0/6, +1 defense)
+  AddOwnLoot(ll, "RKWL", 2); -- Rock Wall (0/10)
+
+ -- lvl 3 spells
+  ll = 3;
+  AddOwnLoot(ll, "ORGD", 3); -- Orc Guard (2/5)
+  AddOwnLoot(ll, "ORSH", 2); -- Orc Shaman (1/2)
+  AddOwnLoot(ll, "ORWR", 3); -- Orc Warrior (4/2, +1 offense and defense)
+  AddOwnLoot(ll, "OREL", 2); -- Orc Elder (6/4)
+  AddOwnLoot(ll, "PRAT", 2); -- Plague Rat (3/4)
+  AddOwnLoot(ll, "DMRT", 3); -- Doom Rat (4/5)
+  AddOwnLoot(ll, "NWLF", 2); -- Night Wolf (1/1)
+  AddOwnLoot(ll, "SHWL", 3); -- Shadow Wolf (4/3)
+  AddOwnLoot(ll, "BATT", 2); -- Bat (3/2)
+  AddOwnLoot(ll, "GBAT", 3); -- Giant Bat (5/4)
+  AddOwnLoot(ll, "SLWL", 2); -- Silicon Wall (0/6, +1 defense)
+  AddOwnLoot(ll, "RKWL", 2); -- Rock Wall (0/10)
+  AddOwnLoot(ll, "WLMG", 2); -- Wall of Magma (2/5)
+  AddOwnLoot(ll, "WLLV", 2); -- Wall of Lava (1/8)
+  AddOwnLoot(ll, "GROG", 2); -- Gray Ogre (6/5)
+  AddOwnLoot(ll, "FRBL", 2); -- Fireball
+  AddOwnLoot(ll, "COMT", 2); -- Comet
+  AddOwnLoot(ll, "BRGR", 2); -- Burning Graves
+  AddOwnLoot(ll, "RIFT", 2); -- Rift
+  AddOwnLoot(ll, "FLIC", 2); -- Flame Lick
+  AddOwnLoot(ll, "STRG", 2); -- Strength
+  AddOwnLoot(ll, "ERQA", 2); -- Earth Quake
+  AddOwnLoot(ll, "WNFL", 2); -- Winds of Flame
+  AddOwnLoot(ll, "JYHD", 2); -- Anger
+  AddOwnLoot(ll, "CRBL", 2); -- Crystal Ball
+  AddOwnLoot(ll, "ETCH", 1); -- Ethereal Resonance
+  AddOwnLoot(ll, "BASO", 1); -- Barbed Souls
+
+ -- lvl 4 spells
+  ll = 4;
+  AddOwnLoot(ll, "CCLP", 3); -- Cyclops (9/9)
+  AddOwnLoot(ll, "GBAT", 2); -- Giant Bat (5/4)
+  AddOwnLoot(ll, "VBAT", 3); -- Vampire Bat (6/6)
+  AddOwnLoot(ll, "GROG", 2); -- Gray Ogre (6/5)
+  AddOwnLoot(ll, "OGKN", 3); -- Ogre King (7/8)
+  AddOwnLoot(ll, "OREL", 2); -- Orc Elder (6/4)
+  AddOwnLoot(ll, "ORWR", 1); -- Orc Warrior (4/2, +1 offense and defense)
+  AddOwnLoot(ll, "WLIF", 3); -- Wall of Inferno Flames (1/10)
+  AddOwnLoot(ll, "WLLV", 3); -- Wall of Lava (1/8)
+  AddOwnLoot(ll, "ERQA", 3); -- Earth Quake
+  AddOwnLoot(ll, "WNFL", 3); -- Winds of Flame
+  AddOwnLoot(ll, "FRST", 3); -- Fire Storm
+  AddOwnLoot(ll, "SNOV", 3); -- Supernova
+  AddOwnLoot(ll, "COMT", 3); -- Comet
+  AddOwnLoot(ll, "CTST", 3); -- Catastrophe
+  AddOwnLoot(ll, "DSIG", 3); -- Disintegrate
+  AddOwnLoot(ll, "RIFT", 3); -- Rift
+  AddOwnLoot(ll, "ETCH", 3); -- Ethereal Resonance
+  AddOwnLoot(ll, "CNBL", 3); -- Cannibalism
+  AddOwnLoot(ll, "BLKD", 3); -- Defense
+  AddOwnLoot(ll, "MNBN", 3); -- Ether Burn 
+  AddOwnLoot(ll, "VOLC", 2); -- Volcano
+  AddOwnLoot(ll, "WEAK", 2); -- Weaken
+  AddOwnLoot(ll, "STRG", 2); -- Strength
+  AddOwnLoot(ll, "RNST", 2); -- Rain of Stones
+  AddOwnLoot(ll, "IMML", 2); -- Rage
+  AddOwnLoot(ll, "ANHL", 3); -- Annihilation
+  AddOwnLoot(ll, "MNVR", 3); -- Ether Vortex
+  AddOwnLoot(ll, "MNBR", 2); -- Ether Breeze
+  AddOwnLoot(ll, "FRBL", 2); -- Fireball
+  AddOwnLoot(ll, "SMOK", 3); -- Smoke
+  AddOwnLoot(ll, "BRGR", 2); -- Burning Graves
+  AddOwnLoot(ll, "BASO", 3); -- Barbed Souls
+  AddOwnLoot(ll, "BROT", 2); -- Burnout
+end;
+
+-- Possible spell drops when playing as kinet
+function InitKinetLootTable()
+ -- lvl 1 spells
+  local ll = 1;
+  AddOwnLoot(ll, "GBBR", 3); -- Gibberling (2/1)
+  AddOwnLoot(ll, "GBIN", 3); -- Gibberling Instigator (3/1)
+  AddOwnLoot(ll, "AVAS", 2); -- Aviak Assassin (2/1)
+  AddOwnLoot(ll, "AVMK", 2); -- Aviak Marksman (2/1)
+  AddOwnLoot(ll, "RVHL", 2); -- River Halo (0/1)
+  AddOwnLoot(ll, "SEHL", 2); -- Sea Halo (1/4)
+  AddOwnLoot(ll, "WLAR", 2); -- Wall of Air (0/2)
+  AddOwnLoot(ll, "WLBZ", 2); -- Wall of Breeze (0/6)
+  AddOwnLoot(ll, "HUNG", 1); -- Hunger
+  AddOwnLoot(ll, "CLNP", 2); -- Lesser Disenchant
+  AddOwnLoot(ll, "SPWR", 1); -- Spirit of War
+  AddOwnLoot(ll, "SCSK", 2); -- Scale Skin
+  AddOwnLoot(ll, "MGHT", 1); -- Might
+
+ -- lvl 2 spells
+  ll = 2;
+  AddOwnLoot(ll, "WLBZ", 1); -- Wall of Breeze (0/6)
+  AddOwnLoot(ll, "CLNP", 2); -- Water Link
+  AddOwnLoot(ll, "UNSM", 2); -- Unsummon
+  AddOwnLoot(ll, "SWHL", 2); -- Swamp Halo (3/7)
+  AddOwnLoot(ll, "SHSP", 1); -- Shaman Spirit (2/4)
+  AddOwnLoot(ll, "CURS", 1); -- Curse
+  AddOwnLoot(ll, "MALS", 1); -- Malison
+  AddOwnLoot(ll, "ENFR", 1); -- Enforcements
+  AddOwnLoot(ll, "AWAK", 1); -- Renewal
+
+ -- lvl 3 spells
+  ll = 3;
+  AddOwnLoot(ll, "SHSP", 3); -- Shaman Spirit (2/4)
+  AddOwnLoot(ll, "CLSP", 3); -- Cleric Spirit (1/5)
+  AddOwnLoot(ll, "WRSP", 3); -- Warrior Spirit (3/1)
+  AddOwnLoot(ll, "WZSP", 3); -- Wizard Spirit (3/2)
+  AddOwnLoot(ll, "GBGN", 3); -- Gibberling Gang (4/1)
+  AddOwnLoot(ll, "AVAS", 1); -- Aviak Assassin (2/1)
+  AddOwnLoot(ll, "AVMK", 1); -- Aviak Marksman (2/1)
+  AddOwnLoot(ll, "AVEL", 3); -- Aviak Elder (2/2, +1 offense and defense)
+  AddOwnLoot(ll, "SWHL", 3); -- Swamp Halo (3/7)
+  AddOwnLoot(ll, "LMMN", 3); -- Lamia Monk (4/8)
+  AddOwnLoot(ll, "LMWA", 3); -- Lamia Warrior (7/7)
+  AddOwnLoot(ll, "LMWD", 1); -- Lamia Warlord (8/7)
+  AddOwnLoot(ll, "WLBZ", 2); -- Wall of Breeze (0/6)
+  AddOwnLoot(ll, "WLWD", 2); -- Wall of Wind (0/9)
+  AddOwnLoot(ll, "MGHT", 3); -- Might
+  AddOwnLoot(ll, "SHSK", 3); -- Shell Skin
+  AddOwnLoot(ll, "HOAM", 2); -- Hostile Ambience
+  AddOwnLoot(ll, "FLOD", 2); -- Flood
+  AddOwnLoot(ll, "CNAR", 2); -- Condensed Air
+  AddOwnLoot(ll, "ERBN", 2); -- Earth Bonds
+  AddOwnLoot(ll, "SPWR", 2); -- Spirit of War
+
+ -- lvl 4 spells
+  ll = 4;
+  AddOwnLoot(ll, "BLDG", 3); -- Black Dragon
+  AddOwnLoot(ll, "BUDG", 3); -- Blue Dragon
+  AddOwnLoot(ll, "GRDG", 3); -- Green Dragon
+  AddOwnLoot(ll, "RDDG", 3); -- Red Dragon
+  AddOwnLoot(ll, "AREL", 3); -- Air Elemental (3/6)
+  AddOwnLoot(ll, "EREL", 3); -- Earth Elemental (6/6)
+  AddOwnLoot(ll, "FREL", 3); -- Fire Elemental (6/5)
+  AddOwnLoot(ll, "WTEL", 3); -- Water Elemental (6/7)
+  AddOwnLoot(ll, "LMWK", 3); -- Lamia Warlock (9/5)
+  AddOwnLoot(ll, "LMWD", 3); -- Lamia Warlord (8/7)
+  AddOwnLoot(ll, "WLWD", 2); -- Wall of Wind (0/9)
+  AddOwnLoot(ll, "WLFC", 3); -- Wall of Force (0/12)
+  AddOwnLoot(ll, "CHCM", 3); -- Change of Command
+  AddOwnLoot(ll, "SHFR", 3); -- Shield of Force
+  AddOwnLoot(ll, "PSBR", 3); -- Poison Breath
+  AddOwnLoot(ll, "SPTR", 2); -- Thirsty Creatures
+  AddOwnLoot(ll, "COPL", 3); -- Life Channel
+  AddOwnLoot(ll, "CRHG", 3); -- Curse of Hunger
+  AddOwnLoot(ll, "JUST", 3); -- Power of Balance
+  AddOwnLoot(ll, "DECN", 3); -- Greater Disenchant
+  AddOwnLoot(ll, "GRUN", 3); -- Greater Unsummoning
+  AddOwnLoot(ll, "FRWN", 3); -- Fresh Wind
+  AddOwnLoot(ll, "MDBL", 3); -- Mind Blast
+  AddOwnLoot(ll, "FURY", 3); -- Fury
+  AddOwnLoot(ll, "ICST", 2); -- Ice Storm
+  AddOwnLoot(ll, "AMNS", 2); -- Amnesia
+  AddOwnLoot(ll, "AWAK", 1); -- Renewal
+  AddOwnLoot(ll, "ENFR", 1); -- Enforcements
+  AddOwnLoot(ll, "STSI", 2); -- Stasis
+  AddOwnLoot(ll, "SPWR", 2); -- Spirit of War
+end;
+
+-- Possible spell drops when playing as synthet
+function InitSynthetLootTable()
+ -- lvl 1 spells
+  local ll = 1;
+  AddOwnLoot(ll, "MCWU", 1); -- Mechwurm (3/2)
+  AddOwnLoot(ll, "FAIL", 2); -- Failure
+  AddOwnLoot(ll, "BRAB", 2); -- Bronze Abomination (1/2)
+  AddOwnLoot(ll, "MNHP", 2); -- Mini Hopper (1/2)
+  AddOwnLoot(ll, "HOPR", 2); -- Hopper (2/3)
+  AddOwnLoot(ll, "PTRS", 1); -- Pteros (2/4)
+  AddOwnLoot(ll, "SMVL", 2); -- Small Velos (3/1)
+  AddOwnLoot(ll, "BGVL", 1); -- Big Velos (4/2)
+  AddOwnLoot(ll, "DWND", 1); -- Dwindle
+  AddOwnLoot(ll, "INCR", 2); -- Inconsistent Reality
+  AddOwnLoot(ll, "WETX", 1); -- Weak Toxin
+  AddOwnLoot(ll, "PRFY", 2); -- Purify
+  AddOwnLoot(ll, "WLIL", 2); -- Wall of Illusion (0/3)
+  AddOwnLoot(ll, "RECL", 2); -- Data Impulse
+
+ -- lvl 2 spells
+  ll = 2;
+  AddOwnLoot(ll, "PRFY", 2); -- Purify
+  AddOwnLoot(ll, "PTRS", 2); -- Pteros (2/4)
+  AddOwnLoot(ll, "RECL", 2); -- Data Impulse
+  AddOwnLoot(ll, "PHWL", 2); -- Phantasmal Wall (0/6)
+  AddOwnLoot(ll, "NOIS", 1); -- Noise
+  AddOwnLoot(ll, "DWND", 1); -- Dwindle
+
+ -- lvl 3 spells
+  ll = 3;
+  AddOwnLoot(ll, "BRMC", 3); -- Bronze Mechos (5/3)
+  AddOwnLoot(ll, "IRMC", 2); -- Iron Mechos (6/4)
+  AddOwnLoot(ll, "WETX", 2); -- Weak Toxin
+  AddOwnLoot(ll, "DISM", 2); -- Disempower
+  AddOwnLoot(ll, "CLON", 2); -- Clone
+  AddOwnLoot(ll, "EXIL", 2); -- Exile
+  AddOwnLoot(ll, "WLDG", 2); -- Wall of Daggers (2/5)
+  AddOwnLoot(ll, "PALN", 2); -- Pain Link
+  AddOwnLoot(ll, "SMVL", 2); -- Small Velos (3/1)
+  AddOwnLoot(ll, "BGVL", 2); -- Big Velos (4/2)
+  AddOwnLoot(ll, "BRMZ", 3); -- Bronze Mechozaurus (4/3)
+  AddOwnLoot(ll, "DRGS", 2); -- Drowsy Gas
+  AddOwnLoot(ll, "DPGS", 2); -- Depressing Gas
+  AddOwnLoot(ll, "SFGS", 2); -- Suffocating Gas
+  AddOwnLoot(ll, "MCWY", 2); -- Mechwyrm (5/4)
+  AddOwnLoot(ll, "MCWU", 2); -- Mechwurm (3/2)
+  AddOwnLoot(ll, "PTRS", 2); -- Pteros (2/4)
+  AddOwnLoot(ll, "RFPT", 2); -- Pteros (3/6)
+  AddOwnLoot(ll, "CTMN", 2); -- Cutterman (7/4)
+  AddOwnLoot(ll, "DELS", 1); -- Delusion
+  AddOwnLoot(ll, "IMMB", 2); -- Immobilize
+  AddOwnLoot(ll, "MXHP", 2); -- Maxi Hopper (3/4)
+  AddOwnLoot(ll, "RPST", 2); -- Repair Station
+
+ -- lvl 4
+  ll = 4;
+  AddOwnLoot(ll, "CTMN", 1); -- Cutterman (7/4)
+  AddOwnLoot(ll, "SWMN", 3); -- Sawerman (9/6)
+  AddOwnLoot(ll, "RZMN", 3); -- Razorman (11/8)
+  AddOwnLoot(ll, "IRMC", 2); -- Iron Mechos (6/4)
+  AddOwnLoot(ll, "STMC", 3); -- Steel Mechos (8/6)
+  AddOwnLoot(ll, "IRMZ", 4); -- Iron Mechozaurus (6/4)
+  AddOwnLoot(ll, "STMZ", 4); -- Steel Mechozaurus (8/6)
+  AddOwnLoot(ll, "FMFI", 2); -- Female Fighter (6/6)
+  AddOwnLoot(ll, "MLFI", 2); -- Male Fighter (8/8)
+  AddOwnLoot(ll, "WKHR", 3); -- Walking Horror (9/9)
+  AddOwnLoot(ll, "FRGS", 2); -- Frenzy Gas
+  AddOwnLoot(ll, "DELS", 2); -- Delusion
+  AddOwnLoot(ll, "CLFR", 3); -- Cloak of Fear
+  AddOwnLoot(ll, "LSPC", 2); -- Data Surge
+  AddOwnLoot(ll, "DPGS", 2); -- Depressing Gas
+  AddOwnLoot(ll, "DELS", 1); -- Delusion
+  AddOwnLoot(ll, "ENAL", 3); -- Energize All
+  AddOwnLoot(ll, "ENRG", 2); -- Energize
+  AddOwnLoot(ll, "IRRT", 2); -- Irritation
+  AddOwnLoot(ll, "MDNS", 2); -- Madness
+  AddOwnLoot(ll, "STTX", 2); -- Strong Toxin
+  AddOwnLoot(ll, "REPR", 1); -- Repair
+  AddOwnLoot(ll, "LQRL", 3); -- Steal Reality
+  AddOwnLoot(ll, "BRRL", 2); -- Broken Reality
+  AddOwnLoot(ll, "REDR", 2); -- Redirect
+  AddOwnLoot(ll, "TPLF", 3); -- Tap Life
+  AddOwnLoot(ll, "WLBL", 2); -- Wall of Blades (6/9)
+  AddOwnLoot(ll, "CLON", 2); -- Clone
+  AddOwnLoot(ll, "EXIL", 2); -- Exile
+  AddOwnLoot(ll, "BDEX", 2); -- Body Exchange
+  AddOwnLoot(ll, "TRLB", 2); -- Data Attraction
+  AddOwnLoot(ll, "MDWP", 2); -- Mind Wipe
+  AddOwnLoot(ll, "RBRT", 2); -- Revive
+
+end;
+
+-- Possible spell drops when playing as vitali
+function InitVitaliLootTable()
+ --lvl 1 spells
+  local ll = 1;
+  AddOwnLoot(ll, "DOMN", 1); -- Dominance
+  AddOwnLoot(ll, "ETTD", 2); -- Sacrificial Cleansing
+  AddOwnLoot(ll, "TNSA", 2); -- Treant Sapling (1/1)
+  AddOwnLoot(ll, "TANT", 2); -- Treant (2/2)
+  AddOwnLoot(ll, "GIFG", 1); -- Giant Fingus (2/7)
+  AddOwnLoot(ll, "CAFG", 2); -- Carnivorous Fingus (0/6)
+  AddOwnLoot(ll, "GRSN", 1); -- Grass Snake (1/1)
+  AddOwnLoot(ll, "MNTP", 2); -- Ether Tap
+  AddOwnLoot(ll, "TRAD", 2); -- Weird Exchange
+  AddOwnLoot(ll, "MAHO", 1); -- Magic Hornet (2/2)
+  AddOwnLoot(ll, "BEWR", 2); -- Bee Warrior (1/1)
+  AddOwnLoot(ll, "BEWK", 2); -- Bee Worker (0/1, +1 offense)
+  AddOwnLoot(ll, "TIWK", 1); -- Tick Worker (0/2, +1 offense)
+  AddOwnLoot(ll, "TIQN", 1); -- Tick Queen (0/1, +1 defense)
+  AddOwnLoot(ll, "SNRG", 2); -- Stone Ring
+  AddOwnLoot(ll, "MNTX", 1); -- Ether Harvest
+
+ --lvl 2 spells
+  ll = 2;
+  AddOwnLoot(ll, "DRFR", 2); -- Dark Forest (<= 3)
+  AddOwnLoot(ll, "LSHE", 1); -- Lesser Healing
+  AddOwnLoot(ll, "MNTX", 1); -- Ether Harvest
+  AddOwnLoot(ll, "MYHO", 2); -- Mystic Hornet (3/3)
+  AddOwnLoot(ll, "MAHO", 1); -- Magic Hornet (2/2)
+  AddOwnLoot(ll, "SPBA", 1); -- Spirit of the Basilisk
+  AddOwnLoot(ll, "UPGD", 2); -- Blessing of the Woods
+  AddOwnLoot(ll, "GIFG", 3); -- Giant Fingus (2/7)
+  AddOwnLoot(ll, "CAFG", 1); -- Carnivorous Fingus (0/6)
+  AddOwnLoot(ll, "STWO", 2); -- Strength of the Woods
+  AddOwnLoot(ll, "ENWO", 1); -- Endurance of the Woods
+  AddOwnLoot(ll, "DOMN", 1); -- Dominance
+  AddOwnLoot(ll, "HRCN", 2); -- Hurricane
+  AddOwnLoot(ll, "GRSN", 1); -- Grass Snake (1/1)
+  AddOwnLoot(ll, "MNTS", 2); -- Mantis (4/4)
+  AddOwnLoot(ll, "BLSS", 1); -- Bless
+  AddOwnLoot(ll, "TANT", 2); -- Treant (2/2)
+  AddOwnLoot(ll, "GRTN", 2); -- Great Treant (3/3)
+  AddOwnLoot(ll, "TIWK", 1); -- Tick Worker (0/2, +1 offense)
+  AddOwnLoot(ll, "TIQN", 1); -- Tick Queen (0/1, +1 defense)
+  AddOwnLoot(ll, "CANV", 1); -- Force of Sacrifice
+
+ --lvl 3 spells
+  ll = 3;
+  AddOwnLoot(ll, "TIWK", 1); -- Tick Worker (0/2, +1 offense)
+  AddOwnLoot(ll, "TIQN", 1); -- Tick Queen (0/1, +1 defense)
+  AddOwnLoot(ll, "MOTI", 2); -- Mother Tick (0/3)
+  AddOwnLoot(ll, "MOBE", 2); -- Mother Bee (0/2)
+  AddOwnLoot(ll, "BEQN", 2); -- Bee Queen (0/1, +1 offense and defense)
+  AddOwnLoot(ll, "BEWK", 2); -- Bee Worker (0/1, +1 offense)
+  AddOwnLoot(ll, "BEHD", 2); -- Evil Eye (3/3)
+  AddOwnLoot(ll, "BHWR", 1); -- Evil Eye Warrior (5/3)
+  AddOwnLoot(ll, "SNCR", 2); -- Stone Cirle (+2 ether channels)
+  AddOwnLoot(ll, "HEAL", 1); -- Healing (up to 50% HP)
+  AddOwnLoot(ll, "LSHE", 1); -- Lesser Healing
+  AddOwnLoot(ll, "STWO", 2); -- Strength of the Woods
+  AddOwnLoot(ll, "ENWO", 2); -- Endurance of the Woods
+  AddOwnLoot(ll, "DOMN", 1); -- Dominance
+  AddOwnLoot(ll, "MTSC", 2); -- Mantis Scribe (5/5)
+  AddOwnLoot(ll, "MNTS", 2); -- Mantis (4/4)
+  AddOwnLoot(ll, "GRFG", 1); -- Gargantuan Fingus (3/9, +1 offense and defense)
+  AddOwnLoot(ll, "GIFG", 1); -- Giant Fingus (2/7)
+  AddOwnLoot(ll, "SWSN", 2); -- Swamp Snake (2/2)
+  AddOwnLoot(ll, "TRSN", 2); -- Tree Snake (1/1)
+  AddOwnLoot(ll, "GRSN", 2); -- Grass Snake (1/1)
+  AddOwnLoot(ll, "LASN", 1); -- Lake Snake (3/2)
+  AddOwnLoot(ll, "GRTN", 2); -- Great Treant (3/3)
+  AddOwnLoot(ll, "ANTN", 2); -- Ancient Treant (4/4)
+  AddOwnLoot(ll, "MYHO", 3); -- Mystic Hornet (3/3)
+  AddOwnLoot(ll, "GLDT", 2); -- Glitterdust
+  AddOwnLoot(ll, "SYMB", 2); -- Symbiosis
+  AddOwnLoot(ll, "BLSS", 1); -- Bless
+  AddOwnLoot(ll, "ENVM", 2); -- Envenoming
+  AddOwnLoot(ll, "FTDS", 1); -- Fatal Disease
+  AddOwnLoot(ll, "SNHG", 1); -- Stone Henge
+  AddOwnLoot(ll, "HAST", 1); -- Haste
+  AddOwnLoot(ll, "MNDW", 2); -- Ether Draw (pay 1, get 4)
+  AddOwnLoot(ll, "HRCN", 2); -- Hurricane
+  AddOwnLoot(ll, "CANV", 1); -- Force of Sacrifice
+
+ --lvl 4 spells
+  ll = 4;
+  AddOwnLoot(ll, "CANV", 1); -- Force of Sacrifice
+  AddOwnLoot(ll, "ANFR", 2); -- Ancient Forest (<= 5)
+  AddOwnLoot(ll, "ASLT", 2); -- Assault
+  AddOwnLoot(ll, "VTLY", 2); -- Vitality
+  AddOwnLoot(ll, "MNTH", 3); -- Ether Thorns
+  AddOwnLoot(ll, "HAST", 2); -- Haste
+  AddOwnLoot(ll, "SNHG", 2); -- Stone Henge
+  AddOwnLoot(ll, "BEHD", 2); -- Evil Eye (3/3)
+  AddOwnLoot(ll, "BHWR", 2); -- Evil Eye Warrior (5/3)
+  AddOwnLoot(ll, "BHMO", 2); -- Evil Eye Mother (6/7)
+  AddOwnLoot(ll, "CLSN", 2); -- Cleansing
+  AddOwnLoot(ll, "GRHE", 2); -- Greater Healing
+  AddOwnLoot(ll, "MTPT", 3); -- Mantis Patriarch (6/6)
+  AddOwnLoot(ll, "MNTS", 2); -- Mantis (4/4)
+  AddOwnLoot(ll, "MTSC", 2); -- Mantis Scribe (5/5)
+  AddOwnLoot(ll, "GRFG", 2); -- Gargantuan Fingus (3/9, +1 offense and defense)
+  AddOwnLoot(ll, "HRCN", 2); -- Hurricane
+  AddOwnLoot(ll, "FRNT", 2); -- Fury of Nature
+  AddOwnLoot(ll, "FTDS", 2); -- Fatal Disease
+  AddOwnLoot(ll, "TWST", 2); -- Twister
+  AddOwnLoot(ll, "STWO", 2); -- Strength of the Woods
+  AddOwnLoot(ll, "ENWO", 2); -- Endurance of the Woods
+  AddOwnLoot(ll, "THIF", 3); -- Thief
+  AddOwnLoot(ll, "SYMB", 2); -- Symbiosis
+  AddOwnLoot(ll, "SPBA", 3); -- Spirit of the Basilisk
+  AddOwnLoot(ll, "ENVM", 2); -- Envenoming
+  AddOwnLoot(ll, "BLSS", 2); -- Bless
+  AddOwnLoot(ll, "CHNL", 2); -- Ether Trade
+  AddOwnLoot(ll, "SACR", 3); -- Dissolution
+  AddOwnLoot(ll, "SPLK", 2); -- Ether Feeding
+  AddOwnLoot(ll, "CMBN", 2); -- Martyrdom
+  AddOwnLoot(ll, "TIQN", 2); -- Tick Queen (0/1, +1 defense)
+  AddOwnLoot(ll, "TIWK", 2); -- Tick Worker (0/2, +1 offense)
+  AddOwnLoot(ll, "MOTI", 2); -- Mother Tick
+  AddOwnLoot(ll, "ANTN", 2); -- Ancient Treant (4/4)
+end;
+
+function InitForeignLootTable()
+  local race = CHAOS;
+  AddForeignLoot(race, "WNFL", 1); -- Winds of Flame
+  AddForeignLoot(race, "ERQA", 1); -- Earthquake
+  AddForeignLoot(race, "FRBL", 2); -- Fireball
+  AddForeignLoot(race, "STRG", 2); -- Strength
+  AddForeignLoot(race, "WLIF", 2); -- Wall of Inferno Flames (1/10)
+  AddForeignLoot(race, "DSIG", 1); -- Disintegrate
+  AddForeignLoot(race, "SHWL", 2); -- Shadow Wolf (4/3)
+  AddForeignLoot(race, "ETCH", 2); -- Ethereal Resonance
+  AddForeignLoot(race, "IMML", 2); -- Rage
+  AddForeignLoot(race, "ORSH", 2); -- Orc Shaman (1/2)
+  AddForeignLoot(race, "BASO", 1); -- Barbed Souls
+
+  race = KINET;
+  AddForeignLoot(race, "CLNP", 2); -- Lesser Disenchant
+  AddForeignLoot(race, "SPWR", 2); -- Spirit of War
+  AddForeignLoot(race, "HUNG", 2); -- Hunger
+  AddForeignLoot(race, "FOGG", 2); -- Fog
+  AddForeignLoot(race, "UNSM", 2); -- Unsummon
+  AddForeignLoot(race, "SWHL", 2); -- Swamp Halo (3/7)
+  AddForeignLoot(race, "AILK", 2); -- Air Link
+  AddForeignLoot(race, "FDBK", 2); -- Feedback
+  AddForeignLoot(race, "WLWD", 2); -- Wall of Wind (0/9)
+  AddForeignLoot(race, "LMWK", 2); -- Lamia Warlock (9/5)
+
+  race = SYNTHET;
+  AddForeignLoot(race, "BRRL", 1); -- Broken Reality
+  AddForeignLoot(race, "PALN", 2); -- Pain Link
+  AddForeignLoot(race, "DELS", 1); -- Delusion
+  AddForeignLoot(race, "STTX", 2); -- Strong Toxin
+  AddForeignLoot(race, "CLON", 2); -- Clone
+  AddForeignLoot(race, "IMMB", 2); -- Immobilize
+  AddForeignLoot(race, "SLRP", 2); -- Self Repair
+  AddForeignLoot(race, "MXHP", 2); -- Maxi Hopper (3/4)
+  AddForeignLoot(race, "PTRS", 2); -- Pteros (2/4)
+  AddForeignLoot(race, "REPR", 2); -- Repair
+
+  race = VITALI;
+  AddForeignLoot(race, "LASN", 2); -- Lake Snake (3/2)
+  AddForeignLoot(race, "SPBA", 2); -- Spirit of the Basilisk
+  AddForeignLoot(race, "SYMB", 1); -- Symbiosis
+  AddForeignLoot(race, "BHMO", 2); -- Evil Eye Mother (6/7)
+  AddForeignLoot(race, "CLSN", 2); -- Cleansing
+  AddForeignLoot(race, "HAST", 2); -- Haste
+  AddForeignLoot(race, "GRFG", 2); -- Gargantuan Fingus (3/9, +1 offense and defense)
+  AddForeignLoot(race, "MNDW", 2); -- Ether Draw (pay 1, get 4)
+  AddForeignLoot(race, "MTSC", 2); -- Mantis Scribe (5/5)
+  AddForeignLoot(race, "LSHE", 2); -- Lesser Healing
+
+  FOREIGN_LOOT_LIST[MAIN_HERO_RACE] = {};
+
+  -- in colorless areas, you can find spells of all of the four colors
+  local race_index = -1;
+  for race_index = CHAOS, VITALI do
+    for i = 1, getn(FOREIGN_LOOT_LIST[race_index]) do
+      -- foreign loot lists are disjoint, so we can just add them all
+      local spell_code = FOREIGN_LOOT_LIST[race_index][i][1];
+      local frequency = FOREIGN_LOOT_LIST[race_index][i][2];
+      AddForeignLoot(COLORLESS, spell_code, frequency);
+    end;
+  end;
+end;
+
+function ValidateLootLists()
+  for loot_level = 1, getn(LOOT_LIST) do
+    ValidateLootList(LOOT_LIST[loot_level]);
+  end
+
+  for race = 1, getn(FOREIGN_LOOT_LIST) do
+    if race ~= MAIN_HERO_RACE then
+      ValidateLootList(FOREIGN_LOOT_LIST[race]);
+    end
+  end
+
+  ValidateLootList(LOTTERY_LOOT_LISTS[TRADER_COLORLESS_ID], true);
+end
+
+function ValidateLootList(list, contains_artefacts)
+  contains_artefacts = contains_artefacts or false;
+  assert(getn(list) > 0, "list is empty");
+
+  for i = 1, getn(list) do
+    local entry = list[i];
+    local code = entry[1];
+
+    if contains_artefacts then
+      ExAddArtefact(MAIN_HERO_ID, code);
+      ExRemoveArtefact(MAIN_HERO_ID, code);
+    else
+      ExAddSpell(MAIN_HERO_ID, code);
+      ExRemoveSpell(MAIN_HERO_ID, code);
+    end
+  end
+end
+
+-- ##############################################################################
+-- #                              LOTTERY SYSTEM                                #
+-- ##############################################################################
+
+LOTTERY_LOOT_LISTS = {};
+
+PLAYER_SIDE = 1;
+TRADER_SIDE = 2;
+
+-- Traders have to belong to TRADER_SIDE. Since all monsters not having side 0 or 1 seem to be deleted on map start, we have to generate them during startup.
+-- The correct IDs will be set during SetUpLottery()
+TRADER_CHAOS_ID = nil;
+TRADER_KINET_ID = nil;
+TRADER_SYNTHET_ID = nil;
+TRADER_VITALI_ID = nil;
+TRADER_COLORLESS_ID = nil;
+
+function RegisterLotteries()
+  local FOREIGN_SPELLS_TEXT = "Zaubersprüche anderer Rassen";
+  local ARTEFACTS_TEXT = "Artefakte";
+
+  OpenLottery(TRADER_CHAOS_ID, FOREIGN_SPELLS_TEXT, 10, 3, 1);
+  OpenLottery(TRADER_KINET_ID, FOREIGN_SPELLS_TEXT, 10, 3, 1);
+  OpenLottery(TRADER_SYNTHET_ID, FOREIGN_SPELLS_TEXT, 10, 3, 1);
+  OpenLottery(TRADER_VITALI_ID, FOREIGN_SPELLS_TEXT, 10, 3, 1);
+  OpenLottery(TRADER_COLORLESS_ID, ARTEFACTS_TEXT, 100, 30, 10, true, 1);
+end
+
+function SetUpLottery()
+  ExSetHostility(PLAYER_SIDE, TRADER_SIDE, false);
+  
+  local TRADER_NAME = "Händler";
+
+  local TRADER_CHAOS_MODEL = "TraderChaos";
+  TRADER_CHAOS_ID = ExCreateHeroForPlayer(TRADER_SIDE, TRADER_CHAOS_MODEL, 123, 187);
+  ExSetHeroName(TRADER_CHAOS_ID, TRADER_NAME);
+  ExAddCommandMobOrient(TRADER_CHAOS_ID, 0, -1);
+
+  local TRADER_KINET_MODEL = "TraderKinet";
+  TRADER_KINET_ID = ExCreateHeroForPlayer(TRADER_SIDE, TRADER_KINET_MODEL, 65, 135);
+  ExSetHeroName(TRADER_KINET_ID, TRADER_NAME);
+  ExAddCommandMobOrient(TRADER_KINET_ID, 0, 1);
+
+  local TRADER_SYNTHET_MODEL = "TraderSynthet";
+  TRADER_SYNTHET_ID = ExCreateHeroForPlayer(TRADER_SIDE, TRADER_SYNTHET_MODEL, 67, 74);
+  ExSetHeroName(TRADER_SYNTHET_ID, TRADER_NAME);
+  ExAddCommandMobOrient(TRADER_SYNTHET_ID, 0, 1);
+
+  local TRADER_VITALI_MODEL = "TraderVitali";
+  TRADER_VITALI_ID = ExCreateHeroForPlayer(TRADER_SIDE, TRADER_VITALI_MODEL, 184, 104);
+  ExSetHeroName(TRADER_VITALI_ID, TRADER_NAME);
+  ExAddCommandMobOrient(TRADER_VITALI_ID, 0, 1);
+
+  local TRADER_COLORLESS_MODEL = "TraderColorless";
+  TRADER_COLORLESS_ID = ExCreateHeroForPlayer(TRADER_SIDE, TRADER_COLORLESS_MODEL, 118, 155);
+  ExSetHeroName(TRADER_COLORLESS_ID, TRADER_NAME);
+  ExAddCommandMobOrient(TRADER_COLORLESS_ID, 1, 0);
+
+  LOTTERY_LOOT_LISTS[TRADER_CHAOS_ID] = FOREIGN_LOOT_LIST[COLORLESS];
+  LOTTERY_LOOT_LISTS[TRADER_KINET_ID] = FOREIGN_LOOT_LIST[COLORLESS];
+  LOTTERY_LOOT_LISTS[TRADER_SYNTHET_ID] = FOREIGN_LOOT_LIST[COLORLESS];
+  LOTTERY_LOOT_LISTS[TRADER_VITALI_ID] = FOREIGN_LOOT_LIST[COLORLESS];
+  AddLotteryLoot(TRADER_COLORLESS_ID, "RodOfRessurection", 1);
+  AddLotteryLoot(TRADER_COLORLESS_ID, "RodOfReflection", 1);
+end
+
+function AddLotteryLoot(trader_id, code, frequency)
+  if LOTTERY_LOOT_LISTS[trader_id] == nil then
+    LOTTERY_LOOT_LISTS[trader_id] = {};
+  end
+  AddSpellToList(LOTTERY_LOOT_LISTS[trader_id], code, frequency);
+end
+
+function OpenLottery(trader_id, selling_description, price_green, price_red, price_blue, is_artefact, max_sales)
+  is_artefact = is_artefact or false;  
+  max_sales = max_sales or LOTTERY_DEFAULT_MAX_SALES;
+  assert(trader_id ~= nil, "trader_id is nil");
+
+  local shop_interaction =
+    function()
+      local trader_id = %trader_id;
+      ExAddCommandMobOrientToObject(trader_id, MAIN_HERO_ID);
+
+      local SOLD_OUT_TEXT = "Tut mir leid, wir sind inzwischen leer gekauft.";
+      local lots_sold = GetState(trader_id);
+      if lots_sold >= %max_sales then
+        ExAddCommandText(trader_id, SOLD_OUT_TEXT, false);
+        return USABLE;
+      end
+
+      local price_factor = lots_sold + 1;
+      local price_green = %price_green * price_factor;
+      local price_red = %price_red * price_factor;
+      local price_blue = %price_blue * price_factor;
+
+      local INTRO_TEXT = "Hallo! Ich verlose " .. %selling_description .. ". Keine Nieten, jedes Los gewinnt!" .. "\n" .. GetLotteryPriceString(price_green, price_red, price_blue);
+      ExAddCommandText(trader_id, INTRO_TEXT, false);
+
+      local green, red, blue = ExGetResources(ExGetCurrentPlayer());
+      if price_green > green then
+        local INSUFFICIENT_GREEN = "Du hast nicht genügend Pflanzen.";
+        ExAddCommandText(trader_id, INSUFFICIENT_GREEN, false);
+      elseif price_red > red then
+        local INSUFFICIENT_RED = "Du hast nicht genügend Rubine.";
+        ExAddCommandText(trader_id, INSUFFICIENT_RED, false);
+      elseif price_blue > blue then
+        local INSUFFICIENT_BLUE = "Du hast nicht genügend Gefrorene Flammen.";
+        ExAddCommandText(trader_id, INSUFFICIENT_BLUE, false);
+      else
+        local WANT_TO_BUY_TEXT = "Möchtest du dein Glück versuchen?";
+        local reward_list = LOTTERY_LOOT_LISTS[trader_id];
+        local is_artefact = %is_artefact;
+        local buy =
+          function()
+            local loot = GetSpell(%reward_list);
+            if loot ~= false then
+              ExAddResources(ExGetCurrentPlayer(), -%price_green, -%price_red, -%price_blue);
+              SetState(%trader_id, %lots_sold + 1);
+
+              ExStartLootMessage();                            
+              if %is_artefact then
+                AddArtefact(MAIN_HERO_ID, loot);
+              else
+                AddSpell(MAIN_HERO_ID, loot);              
+              end
+              ExSendLootMessage();
+            else
+              ExAddCommandText(%trader_id, %SOLD_OUT_TEXT, false);
+            end
+          end
+        AddCommandAskQuestion(trader_id, WANT_TO_BUY_TEXT, buy, nil);
+      end
+
+      return USABLE;
+    end;
+
+  OnUse(trader_id, MAIN_HERO_ID, shop_interaction);
+end
+
+function GetLotteryPriceString(price_green, price_red, price_blue)
+  price = "Ein Los kostet dich:" .. "\n";
+
+  price = price .. "Pflanzen: " .. tostring(price_green) .. "\n";
+  price = price .. "Rubine: " .. tostring(price_red) .. "\n";
+  price = price .. "Gefrorene Flammen: " .. tostring(price_blue);
+
+  return price;
+end
