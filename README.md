@@ -71,7 +71,7 @@ Further, I would like to thank @Bonesnake for providing the [Roguelike map](http
 When I found the map, I was amazed by the possibilities it showcases, such as random loot generation, changing the available shops, etc.
 Seeing this map motivated me to do some experiments with the scripting myself.
 While only very few elements of the roguelike map are contained in the current version of our map, it was definitely an inspiration for me and made it easier to get into Etherlords' scripting API.
-
+Further thanks for helping me fix a nasty caching issue, which occurred because all 4 versions of the map used the same map GUID (Global Unique IDentifier) and broke the map if you played multiple races at the same time. It's fixed now.
 
 # Known technical issues
 To the best of my knowledge, the map contains no game-crashing bugs.
