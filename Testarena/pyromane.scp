@@ -22,7 +22,7 @@ function CHook_BeginMyTurn( turn )
   else
     ExMessageToScreen( "Super-Nova: " .. tostring(turn) .. " damage", 0, 200, 0 );  
     spell = "SNOV";
-    ExSetManalinks(exMe, mana_links + 1);
+    ExCastSpell(exMe, "GEYS");
   end;
   ExCastSpell(exMe, spell, turn);
   ExAddMana(exMe, mana - ExGetPlayerMana(exMe));
