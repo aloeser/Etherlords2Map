@@ -1,4 +1,4 @@
-DIAMANDA = 23;
+HERO = 23;
 
 function InitializeArtefacts()
   -- Artefacts used by monsters and/or heroes
@@ -18,8 +18,11 @@ function InitializeArtefacts()
 
   -- Add the artefacts to monsters. I am not aware of a way to set this within the editor
   local debug_artefacts = { COLOSSUS, KONUNG, INSANITY, RESURRECTION, MAGGOT, DESTRUCTION, ETHER_DEFENSE, UNITY, HEALING, PARALYZATION, HUNTRESS, COMMAND };
-  AddArtefactsToHero(DIAMANDA, debug_artefacts);
+  AddArtefactsToHero(HERO, debug_artefacts);
 
+  local DIAMANDA = 30;
+  local DIAMANDA_ARTEFACTS = { COMMAND, ETHER_DEFENSE };
+  AddArtefactsToHero(DIAMANDA, DIAMANDA_ARTEFACTS);
 end;
 
 -- Helper function to add a single artefact to a hero
@@ -34,10 +37,18 @@ function AddArtefactsToHero(hero_id, artefacts)
   end
 end
 
+function InitializeSpecializations()
+  local specs = {"UAVC", "RBTD", "RMBD", "BCTR", "BWIT", "QIHN", "UGUS", "RLSS", "GFNS", "UWLS", "GBHD", "ARTF", "BFGL", "GFNR", "UFLP", "RPLO", "MNCH", "UOCR", "BENG", "GHLD", "GHRI", "ATMF", "IRSK", "RKBC", "UMTD", "GSWS", "WRBD", "BMZP", "UMBD", "RBNO", "GSLO", "RORT", "FRBD", "GBLP", "BPTD", "ETTI", "RRTR", "RVVE", "BPRC", "GSNV", "BSGP", "GMTM", "GTRL", "BVLD"};
+  for i = 1, getn(specs) do
+    ExGiveNewSpecialization(HERO, specs[i]);
+  end
+end
+
 GAME_LOADED = 0;
 function Local_Hook_GameStarted()
   if GAME_LOADED == 0 then
     InitializeArtefacts();
+    InitializeSpecializations();
     ExAddResources(1, 10000, 5000, 1000);
     GAME_LOADED = 1;
   end;
