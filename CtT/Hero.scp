@@ -1,0 +1,14 @@
+function CHook_BeginMyTurn(turn)
+  if turn == 1 then
+    local difficulty = ExGetDifficultyLevel();
+    if not (difficulty == 2) then
+      local difficulty_string = "";
+      if difficulty == 0 then
+        difficulty_string = "easy";
+      else
+        difficulty_string = "medium";
+      end;
+      ExMessageToScreen("This map MUST be played on HARD difficulty, as most monsters do not have spells at " .. difficulty_string .. " difficulty. Please start over in hard difficulty.", 200, 0, 0);
+    end;
+  end;
+end;

@@ -1,0 +1,8 @@
+function CHook_BeginMyTurn(turn)
+  if turn == 1 then
+    ExCastSpell(exMe, "GRSN");
+    ExCastSpell(exMe, "TRSN");
+    ExCastSpell(exMe, "SWSN");
+    ExCastSpell(exMe, "LASN");
+  end;
+end;
