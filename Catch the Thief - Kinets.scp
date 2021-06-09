@@ -47,14 +47,9 @@ WHITE_LORD_DECKS =
 GAME_LOADED = false
 
 
-LOOT_SYSTEM = 100001; -- large enough to no be the id of any object
+LOOT_SYSTEM = 100001; -- large enough to not be the id of any object
 
 LOTTERY_DEFAULT_MAX_SALES = 3
-
-
--- todos:
--- script ideas
- -- i18n?
 
 
 FOREIGN_LOOT_PERCENT_CHANCE = 40
@@ -666,7 +661,9 @@ function WhiteLordStealShrine(fast_forward)
 
   ExAddCommandJumpToPos(WHITE_LORD, 183, 128);
   ExAddCommandMobOrient(WHITE_LORD, 1, 0);
-  AddCommandSetState(WHITE_LORD, STATE_WL_SHRINE_STOLEN);
+  if not fast_forward then
+    AddCommandSetState(WHITE_LORD, STATE_WL_SHRINE_STOLEN);
+  end
 end
 
 function WhiteLordStealShrineChaos(fast_forward)
@@ -1461,7 +1458,8 @@ function Local_Hook_GameStarted()
     ExStartBackgroundTheme(bg_theme_list[MAIN_HERO_RACE]);
   end
 
-  --FastForwardWhiteLordStateTo(STATE_WL_FLED_INTO_OUTER_REALM);
+  --FastForwardWhiteLordStateTo(STATE_WL_DIAMANDA_SUMMONED);
+  --assert(GetState(WHITE_LORD) == STATE_WL_DIAMANDA_SUMMONED, "bla");
 end;
 
 function Local_Hook_OnCloseMessageBox(choice)
