@@ -23,6 +23,9 @@ function InitializeArtefacts()
   local DIAMANDA = 30;
   local DIAMANDA_ARTEFACTS = { COMMAND, ETHER_DEFENSE };
   AddArtefactsToHero(DIAMANDA, DIAMANDA_ARTEFACTS);
+
+  local NAGINI_SENIOR = 31;
+  AddArtefactToHero(NAGINI_SENIOR, UNITY);
 end;
 
 -- Helper function to add a single artefact to a hero
