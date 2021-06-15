@@ -182,6 +182,9 @@ function InitializeArtefacts()
     AddArtefactToHero(hoppers[i], HEALING);
   end
 
+  local NAGINI_SENIOR = 786;
+  AddArtefactToHero(NAGINI_SENIOR, UNITY);
+
   local ORC_GUARD = 1174;
   AddArtefactToHero(ORC_GUARD, MAGGOT);
 
