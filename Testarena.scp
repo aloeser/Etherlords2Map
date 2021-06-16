@@ -17,7 +17,7 @@ function InitializeArtefacts()
   local SPELLBREAKER = "SpellBreaker";
 
   -- Add the artefacts to monsters. I am not aware of a way to set this within the editor
-  local debug_artefacts = { COLOSSUS, KONUNG, INSANITY, RESURRECTION, MAGGOT, DESTRUCTION, ETHER_DEFENSE, UNITY, HEALING, PARALYZATION, HUNTRESS, COMMAND };
+  local debug_artefacts = { COLOSSUS, KONUNG, INSANITY, RESURRECTION, MAGGOT, DESTRUCTION, ETHER_DEFENSE, UNITY, HEALING, PARALYZATION, HUNTRESS, COMMAND, SPELLBREAKER };
   AddArtefactsToHero(HERO, debug_artefacts);
 
   local DIAMANDA = 30;
