@@ -1,0 +1,26 @@
+function CHook_BeginMyTurn(turn)
+  if turn == 1 then
+    ExMessageToScreen("The nearby plants have improved the local snakes' abilities..", 0, 200, 0);
+  end;
+end;
+
+function CHook_OnVisualSummon(player_id, type, creature_id)
+  if player_id == exMe then
+    local REGENERATION = 10;
+    local TRAMPLE = 6;
+    local RESTLESS = 15;
+    local DESTROY = 7;
+    --local TEST = 7;
+
+    ExSetNewCreatureBaseStat(REGENERATION, 1);
+    ExSetNewCreatureBaseStat(TRAMPLE, 1);
+    ExSetNewCreatureBaseStat(RESTLESS, 1);
+    ExSetNewCreatureBaseStat(DESTROY, 1);
+    --ExSetNewCreatureBaseStat(TEST, 1);
+
+    local POWER = 0;
+    local TOUGHNESS = 1;
+    ExSetNewCreatureBaseStat(POWER, ExGetNewCreatureBaseStat(POWER) + 1);
+    ExSetNewCreatureBaseStat(TOUGHNESS, ExGetNewCreatureBaseStat(TOUGHNESS) + 1);
+  end;
+end;
