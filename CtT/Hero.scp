@@ -1,5 +1,10 @@
 function CHook_BeginMyTurn(turn)
   if turn == 1 then
+    -- increase global fight counter - needed to track how often the hero lost against a certain monster
+    local current_fight_id = ExGetVariable("CURRENT_FIGHT_ID");
+    ExSetVariable("CURRENT_FIGHT_ID", current_fight_id + 1, true);
+
+    -- check difficulty level
     local difficulty = ExGetDifficultyLevel();
     if not (difficulty == 2) then
       local difficulty_string = "";

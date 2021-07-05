@@ -51,7 +51,8 @@ LOOT_SYSTEM = 100001; -- large enough to not be the id of any object
 
 LOTTERY_DEFAULT_MAX_SALES = 3
 
-
+FAILED_ATTEMPTS_BEFORE_ENEMY_SKIPPABLE = 3
+FAILED_ATTEMPTS = {}
 FOREIGN_LOOT_PERCENT_CHANCE = 40
 FOREIGN_LOOT_INNER_RING_PERCENT_CHANCE = 60
 MAX_SPELL_DROP_COUNT = 3
@@ -1414,6 +1415,8 @@ function Local_Hook_GameStarted()
 
   if not GAME_LOADED then
 
+    ExSetVariable("CURRENT_FIGHT_ID", 0, true);
+
     -- make monsters in the inner ring resistant to colorlessness
     for i = 1, getn(COLORLESSNESS_TOLERANT_MONSTERS) do
       ExSetHeroColorlessnessTolerance(COLORLESSNESS_TOLERANT_MONSTERS[i], true);
@@ -1578,6 +1581,39 @@ function Local_Hook_OnHeroKill(hero_id)
 
   return true;
 end;
+
+-- Offers the player the choice to remove a monster if it proves too difficult
+-- It seems hard to tell whether escape was pressed before the fight started, or whether the hero actually got defeated
+-- My solution is to increment a global fight counter inside the hero's combat script - which is only called when combat actually occurs
+LAST_FIGHT_ID = 0
+function Local_Hook_OnBattleFinishing(attacker_id, target_id, winner_id)
+  assert(attacker_id == MAIN_HERO_ID, "attacker was not the main hero, but " .. tostring(attacker_id));
+  assert(winner_id == attacker_id or winner_id == target_id or winner_id == -1, "unexpected system behavior");
+
+  local current_fight_id = ExGetVariable("CURRENT_FIGHT_ID");
+  if current_fight_id ~= LAST_FIGHT_ID then
+    assert(current_fight_id == LAST_FIGHT_ID + 1, "missed a fight, somehow");
+    LAST_FIGHT_ID = current_fight_id;
+
+    if winner_id ~= attacker_id then
+      local attempt_count = (FAILED_ATTEMPTS[target_id] or 0) + 1;
+      FAILED_ATTEMPTS[target_id] = attempt_count;
+
+      if attempt_count >= FAILED_ATTEMPTS_BEFORE_ENEMY_SKIPPABLE then
+        local text = "Scheint ein schwieriger Gegner zu sein! Du hast bisher " .. tostring(attempt_count) .. " mal gegen diesen Gegner verloren. Wenn du möchtest, kannst du diesen Gegner überspringen (es gibt weder Erfahrungspunkte noch Sprüche). Wähle ja um den Gegner zu überspringen, und nein um es weiterhin selbst zu versuchen.\n\n";
+        text = text .. "Seems to be a difficult enemy! So far, you have lost ".. tostring(attempt_count) .. " times against this enemy. If you want, you can skip this fight (you will receive neither experience nor loot). Press yes to skip the fight, and no to keep trying.";
+
+         local skip_monster =
+           function()
+             ExAddCommandJumpToPos(%target_id, 225, 91);
+           end;
+         AddCommandAskQuestion(SYSTEM, text, skip_monster);
+      end;
+    end;
+  end;
+  return nil;
+end;
+
 
 -- ##############################################################################
 -- #                             MAP CONFIGURATION                              #
