@@ -1,0 +1,30 @@
+function modulo(value, modul)
+  while value >= modul do
+    value = value - modul;
+  end;
+  return value;
+end;
+
+-- Etherlords 2 local combat function.
+function CHook_BeginMyTurn( turn )
+  if turn == 1 then
+      ExMessageToScreen( "During this fight, the game will automatically cast earthquake, winds of flame, or supernova at the beginning of a turn. The damage increases each round!", 0, 200, 0 );
+  end;
+  
+  local mana = ExGetPlayerMana(exMe);
+  local mana_links = ExGetManalinks(exMe);
+  if modulo(turn, 3) == 1 then
+    ExMessageToScreen( "Earthquake: " .. tostring(turn) .. " damage", 0, 200, 0 );  
+    spell = "ERQA";
+  elseif modulo(turn, 3) == 2 then
+    ExMessageToScreen( "Winds of flame: " .. tostring(turn) .. " damage", 0, 200, 0 );  
+    spell = "WNFL";
+  else
+    ExMessageToScreen( "Super-Nova: " .. tostring(turn) .. " damage", 0, 200, 0 );  
+    spell = "SNOV";
+    ExCastSpell(exMe, "GEYS");
+  end;
+  ExCastSpell(exMe, spell, turn);
+  ExAddMana(exMe, mana - ExGetPlayerMana(exMe));
+
+end;
