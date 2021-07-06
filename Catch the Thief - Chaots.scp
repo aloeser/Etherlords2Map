@@ -1593,14 +1593,14 @@ function Local_Hook_OnBattleFinishing(attacker_id, target_id, winner_id)
 
   local current_fight_id = ExGetVariable("CURRENT_FIGHT_ID");
   if current_fight_id ~= LAST_FIGHT_ID then
-    assert(current_fight_id == LAST_FIGHT_ID + 1, "missed a fight, somehow");
+    assert(current_fight_id == LAST_FIGHT_ID + 1 or current_fight_id == LAST_FIGHT_ID + 2, "missed a fight, somehow");
     LAST_FIGHT_ID = current_fight_id;
 
     if winner_id ~= attacker_id then
       local attempt_count = (FAILED_ATTEMPTS[target_id] or 0) + 1;
       FAILED_ATTEMPTS[target_id] = attempt_count;
 
-      if attempt_count >= FAILED_ATTEMPTS_BEFORE_ENEMY_SKIPPABLE then
+      if attempt_count >= FAILED_ATTEMPTS_BEFORE_ENEMY_SKIPPABLE and target_id ~= WHITE_LORD and target_id ~= WHITE_LORD_STRONG then
         local text = "Scheint ein schwieriger Gegner zu sein! Du hast bisher " .. tostring(attempt_count) .. " mal gegen diesen Gegner verloren. Wenn du möchtest, kannst du diesen Gegner überspringen (es gibt weder Erfahrungspunkte noch Sprüche). Wähle ja um den Gegner zu überspringen, und nein um es weiterhin selbst zu versuchen.\n\n";
         text = text .. "Seems to be a difficult enemy! So far, you have lost ".. tostring(attempt_count) .. " times against this enemy. If you want, you can skip this fight (you will receive neither experience nor loot). Press yes to skip the fight, and no to keep trying.";
 
