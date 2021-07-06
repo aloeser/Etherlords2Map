@@ -1559,9 +1559,10 @@ function Local_Hook_OnStep()
   end
 end
 
-function Local_Hook_OnHeroKill(hero_id)
+function Local_Hook_OnHeroKill(hero_id, cannot_grant_loot)
   -- Do not grant loot for killing yourself, the debug hero (autokilled), or the White Lord(s)
-  local grant_loot = hero_id ~= MAIN_HERO_ID and hero_id ~= WHITE_LORD and hero_id ~= WHITE_LORD_STRONG and hero_id ~= MAIN_HERO_DEBUG;
+  cannot_grant_loot = cannot_grant_loot or false;
+  local grant_loot = (not cannot_grant_loot) and hero_id ~= MAIN_HERO_ID and hero_id ~= WHITE_LORD and hero_id ~= WHITE_LORD_STRONG and hero_id ~= MAIN_HERO_DEBUG;
   if grant_loot then
     -- gives loot to hero after enemy is killed
     GenerateLoot(hero_id);
@@ -1606,6 +1607,7 @@ function Local_Hook_OnBattleFinishing(attacker_id, target_id, winner_id)
          local skip_monster =
            function()
              ExAddCommandJumpToPos(%target_id, 225, 91);
+             Local_Hook_OnHeroKill(%target_id, true);
            end;
          AddCommandAskQuestion(SYSTEM, text, skip_monster);
       end;
