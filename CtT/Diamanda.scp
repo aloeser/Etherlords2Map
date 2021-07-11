@@ -2,7 +2,7 @@
 
 function CHook_BeginMyTurn(turn)
   if turn == 1 then
-    ExMessageToScreen("Every second creature Diamanda summons will automatically receive the enchants 'Cloak of Fear' and 'Amulet of Ether Defense'", 0, 200, 0);
+    ExMessageToScreen("Every second creature Diamanda summons will automatically receive the enchants 'Cloak of Fear' and 'Amulet of Ether Defense'", 255, 255, 255);
   end;
 end;
 

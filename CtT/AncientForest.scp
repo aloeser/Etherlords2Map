@@ -1,6 +1,6 @@
 function CHook_BeginMyTurn(turn)
   if turn == 1 then
-    ExMessageToScreen("The fight happens in the depths of an ancient forest..", 0, 200, 0);
+    ExMessageToScreen("The fight happens in the depths of an ancient forest..", 255, 255, 255);
     ExCastSpell(exMe, "ANFR");
   end; 
 end;

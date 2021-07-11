@@ -1,6 +1,6 @@
 function CHook_BeginMyTurn(turn)
   if turn == 1 then
-    ExMessageToScreen("The nearby plants have improved the local snakes' abilities..", 0, 200, 0);
+    ExMessageToScreen("The nearby plants have improved the local snakes' abilities..", 255, 255, 255);
   end;
 end;
 
