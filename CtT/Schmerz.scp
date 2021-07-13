@@ -1,0 +1,16 @@
+
+
+function CHook_BeginMyTurn(turn)
+  if turn == 1 then
+    ExMessageToScreen("All monsters summoned...", 0, 200, 0);
+  end;
+end;
+
+function CHook_OnVisualSummon(player_id, type, creature_id)
+  if player_id == exMe then
+    local ELUSIVE = 22;
+    local UNBLOCKABLE = 13;
+    ExSetNewCreatureBaseStat(21, 2);
+    ExSetNewCreatureBaseStat(ELUSIVE, 2);
+   end;
+end;

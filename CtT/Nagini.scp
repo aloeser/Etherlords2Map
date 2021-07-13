@@ -1,0 +1,9 @@
+function CHook_BeginMyTurn(turn)
+  if turn == 1 then
+    ExMessageToScreen("You have entered a pit of snakes..", 255, 255, 255);
+    ExCastSpell(exMe, "GRSN");
+    ExCastSpell(exMe, "TRSN");
+    ExCastSpell(exMe, "SWSN");
+    ExCastSpell(exMe, "LASN");
+  end;
+end;

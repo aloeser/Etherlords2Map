@@ -31,7 +31,7 @@ WHITE_LORD_STRONG = 4419
 SYSTEM = 5623 -- Only used for the cluster image in dialogues
 
 -- List of monster IDs that need colorlessness tolerance
-COLORLESSNESS_TOLERANT_MONSTERS = { 786, 2414, 2426, 2430, 2431, 2463, 2464, 2524, 2979, 2982, 2987, 2988, 2991, 2993, 2994, 3254, 4424, 5596, 5752, MAIN_HERO_DEBUG}
+COLORLESSNESS_TOLERANT_MONSTERS = { 786, 2414, 2426, 2430, 2431, 2463, 2464, 2524, 2979, 2982, 2987, 2988, 2991, 2993, 2994, 3254, 4424, 5596, 5752, 5756, 5758, 5759, 5760, MAIN_HERO_DEBUG}
 
 WHITE_LORD_DECKS = 
 {
@@ -47,16 +47,12 @@ WHITE_LORD_DECKS =
 GAME_LOADED = false
 
 
-LOOT_SYSTEM = 100001; -- large enough to no be the id of any object
+LOOT_SYSTEM = 100001; -- large enough to not be the id of any object
 
 LOTTERY_DEFAULT_MAX_SALES = 3
 
-
--- todos:
--- script ideas
- -- i18n?
-
-
+FAILED_ATTEMPTS_BEFORE_ENEMY_SKIPPABLE = 3
+FAILED_ATTEMPTS = {}
 FOREIGN_LOOT_PERCENT_CHANCE = 40
 FOREIGN_LOOT_INNER_RING_PERCENT_CHANCE = 60
 MAX_SPELL_DROP_COUNT = 3
@@ -186,6 +182,9 @@ function InitializeArtefacts()
   for i = 1, getn(hoppers) do
     AddArtefactToHero(hoppers[i], HEALING);
   end
+
+  local NAGINI_SENIOR = 786;
+  AddArtefactToHero(NAGINI_SENIOR, UNITY);
 
   local ORC_GUARD = 1174;
   AddArtefactToHero(ORC_GUARD, MAGGOT);
@@ -666,7 +665,9 @@ function WhiteLordStealShrine(fast_forward)
 
   ExAddCommandJumpToPos(WHITE_LORD, 183, 128);
   ExAddCommandMobOrient(WHITE_LORD, 1, 0);
-  AddCommandSetState(WHITE_LORD, STATE_WL_SHRINE_STOLEN);
+  if not fast_forward then
+    AddCommandSetState(WHITE_LORD, STATE_WL_SHRINE_STOLEN);
+  end
 end
 
 function WhiteLordStealShrineChaos(fast_forward)
@@ -1414,6 +1415,8 @@ function Local_Hook_GameStarted()
 
   if not GAME_LOADED then
 
+    ExSetVariable("CURRENT_FIGHT_ID", 0, true);
+
     -- make monsters in the inner ring resistant to colorlessness
     for i = 1, getn(COLORLESSNESS_TOLERANT_MONSTERS) do
       ExSetHeroColorlessnessTolerance(COLORLESSNESS_TOLERANT_MONSTERS[i], true);
@@ -1461,7 +1464,8 @@ function Local_Hook_GameStarted()
     ExStartBackgroundTheme(bg_theme_list[MAIN_HERO_RACE]);
   end
 
-  --FastForwardWhiteLordStateTo(STATE_WL_FLED_INTO_OUTER_REALM);
+  --FastForwardWhiteLordStateTo(STATE_WL_DIAMANDA_SUMMONED);
+  --assert(GetState(WHITE_LORD) == STATE_WL_DIAMANDA_SUMMONED, "bla");
 end;
 
 function Local_Hook_OnCloseMessageBox(choice)
@@ -1555,9 +1559,10 @@ function Local_Hook_OnStep()
   end
 end
 
-function Local_Hook_OnHeroKill(hero_id)
+function Local_Hook_OnHeroKill(hero_id, cannot_grant_loot)
   -- Do not grant loot for killing yourself, the debug hero (autokilled), or the White Lord(s)
-  local grant_loot = hero_id ~= MAIN_HERO_ID and hero_id ~= WHITE_LORD and hero_id ~= WHITE_LORD_STRONG and hero_id ~= MAIN_HERO_DEBUG;
+  cannot_grant_loot = cannot_grant_loot or false;
+  local grant_loot = (not cannot_grant_loot) and hero_id ~= MAIN_HERO_ID and hero_id ~= WHITE_LORD and hero_id ~= WHITE_LORD_STRONG and hero_id ~= MAIN_HERO_DEBUG;
   if grant_loot then
     -- gives loot to hero after enemy is killed
     GenerateLoot(hero_id);
@@ -1577,6 +1582,54 @@ function Local_Hook_OnHeroKill(hero_id)
 
   return true;
 end;
+
+-- Offers the player the choice to remove a monster if it proves too difficult
+-- It seems hard to tell whether escape was pressed before the fight started, or whether the hero actually got defeated
+-- My solution is to increment a global fight counter inside the hero's combat script - which is only called when combat actually occurs
+LAST_FIGHT_ID = 0
+function Local_Hook_OnBattleFinishing(attacker_id, target_id, winner_id)
+  assert(attacker_id == MAIN_HERO_ID, "attacker was not the main hero, but " .. tostring(attacker_id));
+  assert(winner_id == attacker_id or winner_id == target_id or winner_id == -1, "unexpected system behavior");
+
+  local current_fight_id = ExGetVariable("CURRENT_FIGHT_ID");
+  if current_fight_id ~= LAST_FIGHT_ID then
+    assert(current_fight_id == LAST_FIGHT_ID + 1 or current_fight_id == LAST_FIGHT_ID + 2, "missed a fight, somehow");
+    LAST_FIGHT_ID = current_fight_id;
+
+    if winner_id ~= attacker_id then
+      local attempt_count = (FAILED_ATTEMPTS[target_id] or 0) + 1;
+      FAILED_ATTEMPTS[target_id] = attempt_count;
+
+      if attempt_count >= FAILED_ATTEMPTS_BEFORE_ENEMY_SKIPPABLE then
+        local KONUNG = 325;
+        local DIAMANDA = 2426;
+        local monster_skippable = target_id ~= KONUNG and target_id ~= DIAMANDA and target_id ~= WHITE_LORD and target_id ~= WHITE_LORD_STRONG
+
+        if monster_skippable then
+          local text = "Scheint ein schwieriger Gegner zu sein! Du hast bisher " .. tostring(attempt_count) .. " mal gegen diesen Gegner verloren. Wenn du möchtest, kannst du diesen Gegner überspringen (es gibt weder Erfahrungspunkte noch Sprüche). Wähle ja um den Gegner zu überspringen, und nein um es weiterhin selbst zu versuchen.\n\n";
+          text = text .. "Seems to be a difficult enemy! So far, you have lost ".. tostring(attempt_count) .. " times against this enemy. If you want, you can skip this fight (you will receive neither experience nor loot). Press yes to skip the fight, and no to keep trying.";
+
+           local skip_monster =
+             function()
+               AddCommandEffectLightning(%target_id);
+               AddCommandEffectLightning(%target_id);
+               AddCommandEffectLightning(%target_id);
+               ExAddCommandExecuteScriptFunction("ExCreateCorpse", %target_id)
+               ExAddCommandJumpToPos(%target_id, 225, 91);
+               Local_Hook_OnHeroKill(%target_id, true);
+             end;
+           AddCommandAskQuestion(SYSTEM, text, skip_monster);
+        else
+          local text = "Scheint ein schwieriger Gegner zu sein! Du hast bisher " .. tostring(attempt_count) .. " mal gegen diesen Gegner verloren. Leider ist dieser Gegner einer der wenigen, die nicht übersprungen werden können\n\n";
+          text = text .. "Seems to be a difficult enemy! So far, you have lost ".. tostring(attempt_count) .. " times against this enemy. Unfortunately, this enemy is among the few enemies that cannot be skipped";
+          ExAddCommandText(SYSTEM, text, false);
+        end;
+      end;
+    end;
+  end;
+  return nil;
+end;
+
 
 -- ##############################################################################
 -- #                             MAP CONFIGURATION                              #

@@ -1,0 +1,26 @@
+function CHook_Init()
+  defense_active = 1
+end;
+
+function CHook_BeginMyTurn(turn)
+  if turn == 1 then
+    ExMessageToScreen("This monster is a prototype that escaped from synthete laboratories. Whenever it has less than 50% of its initial health at the beginning of a turn, it will cast Greater Healing.", 255, 255, 255);
+    start_life = ExGetPlayerHealth(exMe);    
+  end;
+
+  if ExGetPlayerHealth(exMe) < start_life / 2 then
+    ExMessageToScreen("Dropped below 50% of life, casting Greater Healing", 255, 255, 255);
+    ExCastSpell(exMe, "GRHE");
+  end;
+
+  if defense_active == 0 then
+    ExCastSpell(exMe, "BLKD");
+    defense_active = 1;
+  end;
+end;
+
+function CHook_OnVisualRemoveEnchantment(spell_type, owner_id)
+  if owner_id == exMe and spell_type == "BLKD" then
+    defense_active = 1
+  end;
+end;

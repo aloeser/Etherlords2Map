@@ -1,0 +1,17 @@
+function modulo(value, modul)
+  while value >= modul do
+    value = value - modul;
+  end;
+  return value;
+end;
+
+function CHook_BeginMyTurn(turn)
+  local num_turns = 5; 
+  if turn == 1 then
+    ExMessageToScreen("Every " .. tostring(num_turns) .." turns, the White Lord will automatically cast 'Lifeguard' upon himself", 255, 255, 255);
+  end;
+
+  if modulo(turn, num_turns) == 0 then
+    ExCastSpell(exMe, "LFGR", exMe);
+  end;  
+end;

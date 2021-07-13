@@ -1,0 +1,19 @@
+
+
+function CHook_BeginMyTurn(turn)
+  if turn == 1 then
+    ExMessageToScreen("Every second creature Diamanda summons will automatically receive the enchants 'Cloak of Fear' and 'Amulet of Ether Defense'", 255, 255, 255);
+  end;
+end;
+
+function CHook_OnVisualSummon(player_id, type, creature_id)
+  if player_id == exMe then
+    if auto_cast == 1 then
+      ExCastSpell(exMe, "CLFR", creature_id);
+      ExCastSpell(exMe, "ETAM", creature_id);
+      auto_cast = 0;
+    else
+      auto_cast = 1;
+    end;
+  end;
+end;
