@@ -30,7 +30,7 @@ The installation is really easy.
 Open your Etherlords II folder (we use version 1.03, but others should work as well).
 It contains a folder `Maps`, which again contains a folder `Custom`.
 Download all the [files](archive/master.zip) and put them into the `Maps\Custom` folder (all of them).
-Your `Maps` folder should contain all the `Catch the Thief*`-files, and a folder called `CtT`.
+Your `Custom` folder should contain all the `Catch the Thief*`-files, and a folder called `CtT`.
 Afterwards, you can play the mission by selecting Single->Mission->New and then choosing the variant you want to play.
 
 If you have any troubles with the installation, don't hesitate to contact me or make an [issue](https://github.com/aloeser/Etherlords2Map/issues).
