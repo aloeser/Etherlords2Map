@@ -1,0 +1,25 @@
+function modulo(value, modul)
+  while value >= modul do
+    value = value - modul;
+  end;
+  return value;
+end;
+
+function CHook_BeginMyTurn(turn)
+    num_walls = num_walls or 0;     
+    if ExGetPlayerArmySize(exEnemy) < 10 then
+      ExMessageToScreen("Hey, I have a gift for you!", 255, 255, 255);
+      ExCastSpell(exMe, "WLFC");
+      num_walls = num_walls + 1;
+    end;
+end;
+
+function CHook_OnVisualSummon(player_id, type, creature_id)
+  if player_id == exMe then
+      ExCastSpell(exMe, "GIFT", creature_id);
+      if modulo(num_walls, 3) == 0 then
+        --ExMessageToScreen("Please do not modify it!", 255, 255, 255);
+        ExCastSpell(exMe, "ETAM", creature_id);
+      end;
+  end;
+end;
