@@ -4,7 +4,8 @@ We recently rediscovered the game and decided to develop our own map.
 The map started out as a small project for ourselves, so we kept the in-game text in our native language - German. It's not a big deal if you do not speak German: all important (=non-story) dialogues are described in the all-caps section `MUST-READ FOR NON-GERMAN SPEAKERS` (at the bottom). If you do not speak German, you should definitely read this section before you start playing.
 
 Our idea was to offer more power to the players - e.g., higher levels, some spells from other races, and more artifacts than usually available in the mainline campaign; at the same time, we wanted the map to contain challenging and unique fights.
-**The campaign has to played on hard difficulty. Monsters will have no spells on easy and medium difficulty!**
+The map is intended to be difficult, and thus initially only supported hard difficulty.
+After requests from other players, we added also support for easy and medium difficulties: monsters will have the same level, life, proficiencies and spells as in hard difficulty, but you will get ethers faster, and the ether disturbances (the lightning strikes that occur when the fight lasts too long) are delayed in your favor.
 
 We hope you enjoy our map as much as we do. We appreciate any kind of feedback :)
 
@@ -46,15 +47,6 @@ Achieving a good balancing for all 4 races (they will fight the same monsters fr
 Consequently, some monsters may be quite hard with, e.g., kinets, but really easy with, e.g., all the chaot's creature killing spells.
 During playtesting, I managed to defeat each monster with each race while only using spells of my own race (i.e., simulating no lucky spell drops from other races), so I believe that the monsters should not be too hard. (Not winning in first attempt does not make a monster hard :D)
 
-## Reason for allowing only hard mode
-Our mission **can only be played in hard mode**, but not easy or medium mode.
-**Monsters on easy or medium mode will have no spells**.
-
-The main reason for this decision is that we wanted to add a lot of monsters, while keeping the player on a reasonably low level.
-Keeping the player on a low level requires low level monsters (usually around 1-2 levels below you).
-At the same time, we do not want the player to get ethers (much) faster than the monster, rather the other way round; nor do we want the player to have (significantly) more health than the monster.
-We believe that playing in hard mode is a good way to combine those requirements:
-We can give monsters a high health to compensate for their lower level, and boost their ether generation via difficulty (on easy mode, monsters do not get ether as fast, I believe).
 
 ## Further development
 At the moment, we consider the map as finished and do not plan further development, except of fixing potential bugs.

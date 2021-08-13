@@ -22,6 +22,7 @@ function CHook_BeginMyTurn(turn)
     else
       difficulty_string = "medium";
     end;
-    ExMessageToScreen("This map MUST be played on HARD difficulty, as most monsters do not have spells at " .. difficulty_string .. " difficulty. Please start over in hard difficulty.", 255, 0, 0);
+    -- Outdated: I copied all hard decks to easy and medium, so those difficulties can be played now (before monsters had no spells).
+    -- ExMessageToScreen("This map MUST be played on HARD difficulty, as most monsters do not have spells at " .. difficulty_string .. " difficulty. Please start over in hard difficulty.", 255, 0, 0);
   end;
 end;
