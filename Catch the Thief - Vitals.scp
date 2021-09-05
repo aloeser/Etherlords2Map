@@ -2104,6 +2104,7 @@ function InitChaosLootTable()
   AddOwnLoot(ll, "ANHL", 3); -- Annihilation
   AddOwnLoot(ll, "MNVR", 3); -- Ether Vortex
   AddOwnLoot(ll, "MNBR", 2); -- Ether Breeze
+  AddOwnLoot(ll, "MNST", 3); -- Ether Storm
   AddOwnLoot(ll, "FRBL", 2); -- Fireball
   AddOwnLoot(ll, "SMOK", 3); -- Smoke
   AddOwnLoot(ll, "BRGR", 2); -- Burning Graves
